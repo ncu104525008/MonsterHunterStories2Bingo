@@ -11,30 +11,124 @@
     <style>
         .block {
             border-style: solid;
+            font-size: 24px;
+        }
+
+        .btn-purple {
+            color: #fff;
+            background-color: var(--bs-purple);
+            border-color: var(--bs-purple);
+        }
+
+        .btn-outline-purple {
+            color: var(--bs-purple);
+            border-color: var(--bs-purple);
+        }
+
+        .icon {
+            width: 32px;
+            height: 32px;
+            background-size: auto;
+            display: inline-block;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            background-image: url(images/icon.png);
+        }
+
+        .icon::before {
+            content: "";
+            width: 32px;
+            height: 32px;
+            background-size: auto;
+            display: inline-block;
+            background-repeat: no-repeat;
+            overflow: hidden;
+            background-image: url(images/icon.png);
+        }
+
+        .type-1 {
+            background-position: 0px -192px;
+        }
+
+        .type1 {
+            background-position: 0px 0px;
+        }
+
+        .type2 {
+            background-position: 0px -160px;
+        }
+
+        .type3 {
+            background-position: 0px -128px;
+        }
+
+        .type4 {
+            background-position: 0px -96px;
+        }
+
+        .type5 {
+            background-position: 0px -64px;
+        }
+
+        .type6 {
+            background-position: 0px -32px;
+        }
+
+        .attr-1::before {
+            background-position: 0px -320px;
+        }
+
+        .attr1::before {
+            background-position: 0px -224px;
+        }
+
+        .attr2::before {
+            background-position: 0px -288px;
+        }
+
+        .attr3::before {
+            background-position: 0px -256px;
+        }
+
+        .attr4::before {
+            background-position: 0px -352px;
+        }
+
+        .skill {
+            font-size: 20px;
+        }
+
+        .border-top-none {
+            border-top: none;
+        }
+
+        .border-left-none {
+            border-left: none;
         }
     </style>
 </head>
 <body>
     <div class="container-fluid" style="margin-top: 50px;">
         <div class="row">
-            <div class="col-5">
+            <div class="col-lg-1"></div>
+            <div class="col-12 col-lg-4">
                 <div class="row">
                     <div class="col block block-1 line-1 line-4 line-7" data-id="0">請先選擇基因</div>
-                    <div class="col block block-2 line-1 line-5" data-id="0">請先選擇基因</div>
-                    <div class="col block block-3 line-1 line-6 line-8" data-id="0">請先選擇基因</div>
+                    <div class="col block block-2 line-1 line-5 border-left-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0">請先選擇基因</div>
                 </div>
                 <div class="row">
-                    <div class="col block block-4 line-2 line-4" data-id="0">請先選擇基因</div>
-                    <div class="col block block-5 line-2 line-5 line-7 line-8" data-id="0">請先選擇基因</div>
-                    <div class="col block block-6 line-2 line-6" data-id="0">請先選擇基因</div>
+                    <div class="col block block-4 line-2 line-4 border-top-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0">請先選擇基因</div>
                 </div>
                 <div class="row">
-                    <div class="col block block-7 line-3 line-4 line-8" data-id="0">請先選擇基因</div>
-                    <div class="col block block-8 line-3 line-5" data-id="0">請先選擇基因</div>
-                    <div class="col block block-9 line-3 line-6 line-7" data-id="0">請先選擇基因</div>
+                    <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0">請先選擇基因</div>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-12 col-lg-3">
                 <div class="row bingo">
                     <div class="col-12">屬性</div>
                     <div class="col-12">無：100%</div>
@@ -50,28 +144,28 @@
                     <div class="col-12">速度：100%</div>
                 </div>
             </div>
-            <div class="col-4">
+            <div class="col-12 col-lg-4">
                 <div class="row">
                     <div class="col">
                         屬性：
-                        <button class="btn btn-primary filter-btn" data-id="1" data-type="type">無</button>
-                        <button class="btn btn-primary filter-btn" data-id="2" data-type="type">火</button>
-                        <button class="btn btn-primary filter-btn" data-id="3" data-type="type">水</button>
-                        <button class="btn btn-primary filter-btn" data-id="4" data-type="type">雷</button>
-                        <button class="btn btn-primary filter-btn" data-id="5" data-type="type">冰</button>
-                        <button class="btn btn-primary filter-btn" data-id="6" data-type="type">龍</button>
+                        <button class="btn btn-outline-secondary filter-btn" data-color="secondary" data-id="1" data-type="type">無</button>
+                        <button class="btn btn-outline-danger filter-btn" data-color="danger" data-id="2" data-type="type">火</button>
+                        <button class="btn btn-outline-primary filter-btn" data-color="primary" data-id="3" data-type="type">水</button>
+                        <button class="btn btn-outline-warning filter-btn" data-color="warning" data-id="4" data-type="type">雷</button>
+                        <button class="btn btn-outline-info filter-btn" data-color="info" data-id="5" data-type="type">冰</button>
+                        <button class="btn btn-outline-purple filter-btn" data-color="purple" data-id="6" data-type="type">龍</button>
                     </div>
                 </div>
                 <div class="row" style="margin-top: 5px;">
                     <div class="col">
                         猜拳：
-                        <button class="btn btn-primary filter-btn" data-id="4" data-type="attr">無</button>
-                        <button class="btn btn-primary filter-btn" data-id="1" data-type="attr">力量</button>
-                        <button class="btn btn-primary filter-btn" data-id="2" data-type="attr">技巧</button>
-                        <button class="btn btn-primary filter-btn" data-id="3" data-type="attr">速度</button>
+                        <button class="btn btn-outline-secondary filter-btn" data-color="secondary" data-id="4" data-type="attr">無</button>
+                        <button class="btn btn-outline-danger filter-btn" data-color="danger" data-id="1" data-type="attr">力量</button>
+                        <button class="btn btn-outline-success filter-btn" data-color="success" data-id="2" data-type="attr">技巧</button>
+                        <button class="btn btn-outline-primary filter-btn" data-color="primary" data-id="3" data-type="attr">速度</button>
                     </div>
                 </div>
-                <div class="row" id="skill-table" style="overflow: scroll; margin-top: 20px; max-height: 80vh;">
+                <div class="row" id="skill-table" style="overflow-y: scroll; margin-top: 20px; max-height: 80vh;">
                 </div>
             </div>
         </div>
@@ -100,9 +194,9 @@
                     var type = obj.data('type');
                     var attr = obj.data('attr');
 
-                    var name = $('.skill-' + id).text();
+                    var name = $('.skill-' + id).html();
 
-                    $(this).text(name);
+                    $(this).html(name);
                     $(this).data('type', type);
                     $(this).data('attr', attr);
                     $(this).data('id', id);
@@ -118,12 +212,12 @@
                 dataType: 'json',
             }).done(function (data) {
                 var html = '';
-                html += '<div class="col-12" style="margin-top: 5px;"><button class="btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-attr="-1">全/全 ' + data[-1][-1][0].name + '</button></div>';
+                html += '<div class="col-12" style="margin-top: 5px;"><button class="btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-attr="-1"><i class="icon type-1 attr-1"></i> ' + data[-1][-1][0].name + '</button></div>';
 
                 for (var i=1;i<=6;i++) {
                     for (var j=1;j<=4;j++) {
                         $.each(data[i][j], function (k, v) {
-                            html += '<div class="col-12" style="margin-top: 5px;"><button class="btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '">' + v.type + '/' + v.attributes + ' ' + v.name + '</button></div>';
+                            html += '<div class="col-12" style="margin-top: 5px;"><button class="btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '"><i class="icon type' + i + ' attr' + j + '"></i> ' + v.name + '</button></div>';
                         });
                     }
                 }
@@ -135,25 +229,30 @@
                     $(this).removeClass('btn-outline-secondary')
                     $(this).addClass('btn-secondary');
                 });
+
+                filterSkill();
             });
 
             $('.filter-btn').on('click', function () {
-                $(this).toggleClass('btn-outline-primary');
-                $(this).toggleClass('btn-primary');
+                var color = $(this).data('color');
+                $(this).toggleClass('btn-outline-' + color);
+                $(this).toggleClass('btn-' + color);
+                $(this).toggleClass('is-checked');
                 filterSkill();
             });
         });
 
         function filterSkill()
         {
-            if ($('.filter-btn.btn-primary').length === 0) {
+            if ($('.filter-btn.is-checked').length === 10) {
                 $('.skill').parent().show();
                 return false;
             }
 
             $('.skill').parent().hide();
-            var btn1 = $('.filter-btn.btn-primary[data-type=type]');
-            var btn2 = $('.filter-btn.btn-primary[data-type=attr]');
+            $('.skill[data-type=-1][data-attr=-1]').parent().show();
+            var btn1 = $('.filter-btn.is-checked[data-type=type]');
+            var btn2 = $('.filter-btn.is-checked[data-type=attr]');
 
             btn1.each(function () {
                 var b1 = $(this);
@@ -161,7 +260,6 @@
                     var b2 = $(this);
 
                     var selector = '.skill[data-type=' + b1.data('id') + '][data-attr=' + b2.data('id') + ']';
-                    console.log(selector);
                     $(selector).parent().show();
                 });
             });

@@ -35,65 +35,6 @@
             overflow: hidden;
         }
 
-        .icon::before {
-            content: "";
-            width: 32px;
-            height: 32px;
-            background-size: auto;
-            display: inline-block;
-            background-repeat: no-repeat;
-            overflow: hidden;
-            background-image: url(images/icon.png);
-        }
-
-        .type-1 {
-            background-position: 0px -192px;
-        }
-
-        .type1 {
-            background-position: 0px 0px;
-        }
-
-        .type2 {
-            background-position: 0px -160px;
-        }
-
-        .type3 {
-            background-position: 0px -128px;
-        }
-
-        .type4 {
-            background-position: 0px -96px;
-        }
-
-        .type5 {
-            background-position: 0px -64px;
-        }
-
-        .type6 {
-            background-position: 0px -32px;
-        }
-
-        .attr-1::before {
-            background-position: 0px -320px;
-        }
-
-        .attr1::before {
-            background-position: 0px -224px;
-        }
-
-        .attr2::before {
-            background-position: 0px -288px;
-        }
-
-        .attr3::before {
-            background-position: 0px -256px;
-        }
-
-        .attr4::before {
-            background-position: 0px -352px;
-        }
-
         .skill {
             font-size: 20px;
         }

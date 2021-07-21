@@ -7,6 +7,7 @@
     <title>魔物基因配置模擬器</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
         .block {
@@ -32,7 +33,6 @@
             display: inline-block;
             background-repeat: no-repeat;
             overflow: hidden;
-            background-image: url(images/icon.png);
         }
 
         .icon::before {
@@ -113,7 +113,7 @@
             <div class="col-lg-1"></div>
             <div class="col-12 col-lg-4">
                 <div class="row">
-                    <div class="col block block-1 line-1 line-4 line-7" data-id="0">請先選擇基因</div>
+                    <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0">請先選擇基因</div>
                     <div class="col block block-2 line-1 line-5 border-left-none" data-id="0">請先選擇基因</div>
                     <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0">請先選擇基因</div>
                 </div>
@@ -171,6 +171,12 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/dialogify.min.js"></script>
+    <script id="skill-info-template" type="text/template">
+        <div class="row">
+            <div class="col fs-3 info"></div>
+        </div>
+    </script>
     <script>
         $(function () {
             var block = $('.block');
@@ -212,22 +218,26 @@
                 dataType: 'json',
             }).done(function (data) {
                 var html = '';
-                html += '<div class="col-12" style="margin-top: 5px;"><button class="btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-attr="-1"><i class="icon type-1 attr-1"></i> ' + data[-1][-1][0].name + '</button></div>';
+                html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-attr="-1"><img class="icon" src="images/icon/-1/-1.png"> ' + data[-1][-1][0].name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(1);">help_outline</span></div>';
 
                 for (var i=1;i<=6;i++) {
                     for (var j=1;j<=4;j++) {
                         $.each(data[i][j], function (k, v) {
-                            html += '<div class="col-12" style="margin-top: 5px;"><button class="btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '"><i class="icon type' + i + ' attr' + j + '"></i> ' + v.name + '</button></div>';
+                            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '"><img class="icon" src="images/icon/' + j + '/' + i + '.png"> ' + v.name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(' + v.id + ');">help_outline</span></div>';
                         });
                     }
                 }
                 $('#skill-table').html(html);
 
                 $('.skill:enabled').on('click', function () {
+                    var flag = $(this).hasClass('btn-outline-secondary');
                     $('.skill:enabled').removeClass('btn-secondary');
                     $('.skill:enabled').addClass('btn-outline-secondary')
-                    $(this).removeClass('btn-outline-secondary')
-                    $(this).addClass('btn-secondary');
+
+                    if (flag) {
+                        $(this).removeClass('btn-outline-secondary');
+                        $(this).addClass('btn-secondary');
+                    }
                 });
 
                 filterSkill();
@@ -346,6 +356,36 @@
             }
 
             $('.bingo').html(html);
+        }
+
+        var skillInfo = null;
+
+        function getSkillInfo(id)
+        {
+            if (skillInfo === null) {
+                new Dialogify('<p>讀取中...</p>', {closable: false}).showModal();
+                $.ajax({
+                    url: 'ajax/skill_info.json',
+                    method: 'GET',
+                    dataType: 'json',
+                    async: false,
+                }).done(function (data) {
+                    skillInfo = data;
+                    Dialogify.closeAll();
+                });
+            }
+
+            var data = skillInfo[id];
+            var html = '';
+            html += '<p>' + data.name + '</p>';
+            html += '<p>' + data.skill + '</p>';
+            html += '<p>' + data.type + '</p>';
+            html += '<p>消耗：' + data.cost + '</p>';
+            html += '<p>' + data.desc + '</p>';
+
+            var dialog = new Dialogify('#skill-info-template');
+            dialog.$content.find('.info').html(html);
+            dialog.showModal();
         }
     </script>
 </body>

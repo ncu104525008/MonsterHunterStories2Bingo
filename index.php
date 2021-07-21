@@ -165,6 +165,14 @@
                         <button class="btn btn-outline-primary filter-btn" data-color="primary" data-id="3" data-type="attr">速度</button>
                     </div>
                 </div>
+                <div class="row" style="margin-top: 5px;">
+                    <div class="col">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="only-best" id="only-best">
+                            <label class="form-check-label" for="only-best">只顯示最強</label>
+                        </div>
+                    </div>
+                </div>
                 <div class="row" id="skill-table" style="overflow-y: scroll; margin-top: 20px; max-height: 80vh;">
                 </div>
             </div>
@@ -223,7 +231,26 @@
                 for (var i=1;i<=6;i++) {
                     for (var j=1;j<=4;j++) {
                         $.each(data[i][j], function (k, v) {
-                            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '"><img class="icon" src="images/icon/' + j + '/' + i + '.png"> ' + v.name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(' + v.id + ');">help_outline</span></div>';
+                            var reg = new RegExp('^(.+)【(.+)】$');
+                            var tmp = v.name.match(reg);
+
+                            var t = '';
+                            if (tmp) {
+                                var level = 1;
+                                if (tmp[2] === '小') {
+                                    level = 1;
+                                } else if (tmp[2] === '中') {
+                                    level = 2;
+                                } else if (tmp[2] === '大') {
+                                    level = 3;
+                                } else if (tmp[2] === '特大') {
+                                    level = 4;
+                                }
+
+                                t += ' data-name="' + tmp[1] + '" data-level="' + level + '"';
+                            }
+
+                            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '"' + t + '><img class="icon" src="images/icon/' + j + '/' + i + '.png"> ' + v.name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(' + v.id + ');">help_outline</span></div>';
                         });
                     }
                 }
@@ -250,12 +277,16 @@
                 $(this).toggleClass('is-checked');
                 filterSkill();
             });
+
+            $('#only-best').on('change', onlyShowBest);
         });
 
         function filterSkill()
         {
+            $('.skill').removeClass('is-hide');
             if ($('.filter-btn.is-checked').length === 10) {
                 $('.skill').parent().show();
+                onlyShowBest();
                 return false;
             }
 
@@ -273,6 +304,8 @@
                     $(selector).parent().show();
                 });
             });
+
+            onlyShowBest();
         }
 
         function check()
@@ -386,6 +419,39 @@
             var dialog = new Dialogify('#skill-info-template');
             dialog.$content.find('.info').html(html);
             dialog.showModal();
+        }
+
+        function onlyShowBest()
+        {
+            if ($('#only-best').prop('checked') === false) {
+                if ($('.skill.is-hide').length > 0) {
+                    $('.skill.is-hide').parent().show();
+                    $('.skill.is-hide').removeClass('is-hide');
+                }
+                return false;
+            }
+
+            var checkedList = [];
+
+            $('.skill:visible').each(function () {
+                var name = $(this).data('name');
+                if (checkedList.indexOf(name) === -1) {
+                    checkedList.push(name);
+                }
+            });
+
+            $.each(checkedList, function (k, v) {
+                var tmp = [];
+                $('.skill[data-name=' + v + ']:visible').each(function () {
+                    tmp.push($(this).data('level'));
+                    $(this).addClass('is-hide');
+                    $(this).parent().hide();
+                });
+
+                var bestObj = $('.skill[data-name=' + v + '][data-level=' + Math.max(...tmp) + ']');
+                bestObj.parent().show();
+                bestObj.removeClass('is-hide');
+            });
         }
     </script>
 </body>

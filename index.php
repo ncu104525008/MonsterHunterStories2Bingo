@@ -108,6 +108,22 @@
                 </div>
                 <div class="row" style="margin-top: 5px;">
                     <div class="col">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="showSkillType" id="showSkillType1" value="1" checked>
+                            <label class="form-check-label" for="showSkillType1">全部顯示</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="showSkillType" id="showSkillType2" value="2">
+                            <label class="form-check-label" for="showSkillType2">只顯示主動</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="showSkillType" id="showSkillType3" value="3">
+                            <label class="form-check-label" for="showSkillType3">只顯示被動</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 5px;">
+                    <div class="col">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="only-best" id="only-best">
                             <label class="form-check-label" for="only-best">只顯示最強</label>
@@ -191,7 +207,7 @@
                                 t += ' data-name="' + tmp[1] + '" data-level="' + level + '"';
                             }
 
-                            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '"' + t + '><img class="icon" src="images/icon/' + j + '/' + i + '.png"> ' + v.name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(' + v.id + ');">help_outline</span></div>';
+                            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '" data-type2="' + v.type2 + '"' + t + '><img class="icon" src="images/icon/' + j + '/' + i + '.png"> ' + v.name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(' + v.id + ');">help_outline</span></div>';
                         });
                     }
                 }
@@ -220,6 +236,7 @@
             });
 
             $('#only-best').on('change', onlyShowBest);
+            $('[name=showSkillType]').on('change', filterSkill);
         });
 
         function filterSkill()
@@ -236,12 +253,20 @@
             var btn1 = $('.filter-btn.is-checked[data-type=type]');
             var btn2 = $('.filter-btn.is-checked[data-type=attr]');
 
+            var showSkillType = parseInt($('[name=showSkillType]:checked').val(), 10);
             btn1.each(function () {
                 var b1 = $(this);
                 btn2.each(function () {
                     var b2 = $(this);
 
-                    var selector = '.skill[data-type=' + b1.data('id') + '][data-attr=' + b2.data('id') + ']';
+                    var selector = '';
+                    if (showSkillType === 2) {
+                        selector = '.skill[data-type=' + b1.data('id') + '][data-attr=' + b2.data('id') + '][data-type2=主動]';
+                    } else if (showSkillType === 3) {
+                        selector = '.skill[data-type=' + b1.data('id') + '][data-attr=' + b2.data('id') + '][data-type2=被動]';
+                    } else {
+                        selector = '.skill[data-type=' + b1.data('id') + '][data-attr=' + b2.data('id') + ']';
+                    }
                     $(selector).parent().show();
                 });
             });
@@ -356,6 +381,8 @@
             html += '<p>' + data.type + '</p>';
             html += '<p>消耗：' + data.cost + '</p>';
             html += '<p>' + data.desc + '</p>';
+            html += '<hr>';
+            html += '<p class="fs-5">出處：' + data.from + '</p>';
 
             var dialog = new Dialogify('#skill-info-template');
             dialog.$content.find('.info').html(html);

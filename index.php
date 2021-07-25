@@ -46,6 +46,12 @@
         .border-left-none {
             border-left: none;
         }
+
+        .block.is-selected {
+            color: #fff;
+            background-color: var(--bs-gray);
+            border-color: #000;
+        }
     </style>
 </head>
 <body>
@@ -54,19 +60,19 @@
             <div class="col-lg-1"></div>
             <div class="col-12 col-lg-4">
                 <div class="row">
-                    <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0">請先選擇基因</div>
-                    <div class="col block block-2 line-1 line-5 border-left-none" data-id="0">請先選擇基因</div>
-                    <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="" data-attr="">請先選擇基因</div>
+                    <div class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="" data-attr="">請先選擇基因</div>
+                    <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="" data-attr="">請先選擇基因</div>
                 </div>
                 <div class="row">
-                    <div class="col block block-4 line-2 line-4 border-top-none" data-id="0">請先選擇基因</div>
-                    <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="" data-attr="">請先選擇基因</div>
+                    <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="" data-attr="">請先選擇基因</div>
                     <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0">請先選擇基因</div>
                 </div>
                 <div class="row">
-                    <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0">請先選擇基因</div>
-                    <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0">請先選擇基因</div>
-                    <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0">請先選擇基因</div>
+                    <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="" data-attr="">請先選擇基因</div>
+                    <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="" data-attr="">請先選擇基因</div>
+                    <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="" data-attr="">請先選擇基因</div>
                 </div>
             </div>
             <div class="col-12 col-lg-3">
@@ -172,6 +178,31 @@
                     $(this).data('attr', attr);
                     $(this).data('id', id);
                     obj.attr('disabled', '');
+                } else if ($('.block.is-selected').length > 0) {
+                    var obj = $('.block.is-selected');
+                    var id1 = obj.data('id');
+                    var type1 = obj.data('type');
+                    var attr1 = obj.data('attr');
+                    var name1 = obj.html();
+
+                    var id2 = $(this).data('id');
+                    var type2 = $(this).data('type');
+                    var attr2 = $(this).data('attr');
+                    var name2 = $(this).html();
+
+                    $(this).html(name1);
+                    $(this).data('type', type1);
+                    $(this).data('attr', attr1);
+                    $(this).data('id', id1);
+
+                    obj.html(name2);
+                    obj.data('type', type2);
+                    obj.data('attr', attr2);
+                    obj.data('id', id2);
+
+                    obj.removeClass('is-selected');
+                } else {
+                    $(this).addClass('is-selected');
                 }
 
                 check();
@@ -242,12 +273,6 @@
         function filterSkill()
         {
             $('.skill').removeClass('is-hide');
-            if ($('.filter-btn.is-checked').length === 10) {
-                $('.skill').parent().show();
-                onlyShowBest();
-                return false;
-            }
-
             $('.skill').parent().hide();
             $('.skill[data-type=-1][data-attr=-1]').parent().show();
             var btn1 = $('.filter-btn.is-checked[data-type=type]');
@@ -288,7 +313,7 @@
                 if (type1 === type2 && type1 === type3) {
                     type.push(objList.eq(0).data('type'));
                 } else if (type1 == -1 && type2 === type3) {
-                    type.push(objList.eq(0).data('type'));
+                    type.push(objList.eq(2).data('type'));
                 } else if (type2 == -1 && type1 === type3) {
                     type.push(objList.eq(0).data('type'));
                 } else if (type3 == -1 && type1 === type2) {
@@ -302,7 +327,7 @@
                 if (attr1 === attr2 && attr1 === attr3) {
                     attr.push(objList.eq(0).data('attr'));
                 } else if (attr1 == -1 && attr2 === attr3) {
-                    attr.push(objList.eq(0).data('attr'));
+                    attr.push(objList.eq(2).data('attr'));
                 } else if (attr2 == -1 && attr1 === attr3) {
                     attr.push(objList.eq(0).data('attr'));
                 } else if (attr3 == -1 && attr1 === attr2) {

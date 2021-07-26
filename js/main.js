@@ -160,10 +160,12 @@
 
     var setDefaultSkill = function () {
         var skills = location.search;
+        if (skills.length === 0) {
+            return false;
+        }
         skills = skills.split('=');
         skills = skills[1].split(',');
         skills = skills.slice(0, 9);
-        console.log(skills);
 
         $.each(skills, function (k, v) {
             setBlock($('.block-' + (k+1)), v);
@@ -174,7 +176,7 @@
     var clickBlock = function (e) {
         var skillSelected = $('.skill.btn-secondary:enabled');
         var blockSelected = $('.block.is-selected');
-        var blockClick = $(e.target);
+        var blockClick = $(e.target).parents('.block');
         if (skillSelected.length > 0) {
             var nowId = parseInt(blockClick.data('id'), 10);
 

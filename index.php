@@ -18,19 +18,19 @@
             <div class="col-lg-1"></div>
             <div class="col-12 col-lg-4">
                 <div class="row">
-                    <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
-                    <div class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
-                    <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
+                    <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                    <div class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                    <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
                 </div>
                 <div class="row">
-                    <div class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
-                    <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
-                    <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
+                    <div class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                    <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                    <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
                 </div>
                 <div class="row">
-                    <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
-                    <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
-                    <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0">請先選擇基因</div>
+                    <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                    <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                    <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
                 </div>
                 <div class="row" style="margin-top: 20px;">
                     <div class="col"><button class="btn btn-secondary" onclick="clearBingo();">清空</button></div>

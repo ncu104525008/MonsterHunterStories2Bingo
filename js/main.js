@@ -176,7 +176,10 @@
     var clickBlock = function (e) {
         var skillSelected = $('.skill.btn-secondary:enabled');
         var blockSelected = $('.block.is-selected');
-        var blockClick = $(e.target).parents('.block');
+        var blockClick = $(e.target);
+        if (blockClick.hasClass('block') === false) {
+            blockClick = blockClick.parent();
+        }
         if (skillSelected.length > 0) {
             var nowId = parseInt(blockClick.data('id'), 10);
 
@@ -231,7 +234,6 @@
         });
 
         var url = location.protocol + '://' + location.host + location.pathname + '?skills=' + skills;
-        console.log(url);
         window.history.pushState('', '魔物基因配置模擬器', '?skills=' + skills);
 
         $('#share-url').val(url);

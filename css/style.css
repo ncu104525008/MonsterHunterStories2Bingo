@@ -1,0 +1,48 @@
+.block {
+    border-style: solid;
+    font-size: 24px;
+}
+
+.btn-purple {
+    color: #fff;
+    background-color: var(--bs-purple);
+    border-color: var(--bs-purple);
+}
+
+.btn-outline-purple {
+    color: var(--bs-purple);
+    border-color: var(--bs-purple);
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+    background-size: auto;
+    display: inline-block;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+.skill {
+    font-size: 20px;
+}
+
+.border-top-none {
+    border-top: none;
+}
+
+.border-left-none {
+    border-left: none;
+}
+
+.block.is-selected {
+    color: #fff;
+    background-color: var(--bs-gray);
+    border-color: #000;
+}
+
+.col.block div {
+    margin-top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+}

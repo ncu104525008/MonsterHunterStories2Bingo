@@ -233,7 +233,7 @@
             }
         });
 
-        var url = location.protocol + '://' + location.host + location.pathname + '?skills=' + skills;
+        var url = location.protocol + '//' + location.host + location.pathname + '?skills=' + skills;
         window.history.pushState('', '魔物基因配置模擬器', '?skills=' + skills);
 
         $('#share-url').val(url);

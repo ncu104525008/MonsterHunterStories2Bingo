@@ -319,13 +319,11 @@
         var typeText = {1: '無', 2: '火', 3: '水', 4: '雷', 5: '冰', 6: '龍'};
         var attrText = {1: '力量', 2: '技巧', 3: '速度', 4: '無'};
 
-        var html = '';
         var count = {};
         for (var i=0;i<type.length;i++) {
             count[type[i]] = count[type[i]] ? count[type[i]] + 1 : 1;
         }
 
-        html += '<div class="col-12">屬性</div>';
         for (var i=1;i<=6;i++) {
             var rate = 100;
             if (count[i]) {
@@ -336,7 +334,14 @@
                 }
             }
 
-            html += '<div class="col-12">' + typeText[i] + '：' + rate + '%</div>';
+            var target = $('div[data-bingo-type=type][data-feature-key='+i+']').find('.bingo-value');
+            if (rate > 100) {
+                target.addClass('match-bingo');
+            } else {
+                target.removeClass('match-bingo');
+            }
+            target.text(rate);
+
         }
 
         count = {};
@@ -344,8 +349,6 @@
             count[attr[i]] = count[attr[i]] ? count[attr[i]] + 1 : 1;
         }
 
-        html += '<div class="col-12"><hr></div>';
-        html += '<div class="col-12">猜拳</div>';
         for (var i=1;i<=3;i++) {
             var rate = 100;
             if (count[i]) {
@@ -356,10 +359,16 @@
                 }
             }
 
-            html += '<div class="col-12">' + attrText[i] + '：' + rate + '%</div>';
+
+            var target = $('div[data-bingo-type=attr][data-feature-key='+i+']').find('.bingo-value');
+            if (rate > 100) {
+                target.addClass('match-bingo');
+            } else {
+                target.removeClass('match-bingo');
+            }
+            target.text(rate);
         }
 
-        $('.bingo').html(html);
     };
 
     var getSkillInfo = function (id) {

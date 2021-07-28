@@ -1,4 +1,11 @@
-(function (window, $, undefined) {
+(function (window, $, Cookies, undefined) {
+    var darkMode = Cookies.get('darkMode');
+    if (darkMode == 1) {
+        $('body').addClass('dark-mode');
+        $('#light-switch').text('開燈');
+        $('#light-switch').removeClass('link-secondary');
+        $('#light-switch').addClass('link-light');
+    }
     var blocks = $('.block');
     var skillInfo = null;
 
@@ -182,6 +189,15 @@
         var blockSelected = $('.block.is-selected');
         var blockClick = $(e.target);
 
+        if (blockClick.hasClass('clean-block')) {
+            var block = blockClick.parents('.block');
+            var skillId = block.data('id');
+
+            setBlock(block, 0);
+            enableSkill(skillId);
+            return false;
+        }
+
         for (var i=0;i<2;i++) {
             if (blockClick.hasClass('block') === false) {
                 blockClick = blockClick.parent();
@@ -221,7 +237,7 @@
             var skill = $('.skill-' + skillId);
             type = skill.data('type');
             attr = skill.data('attr');
-            name = skill.html();
+            name = skill.html() + '<span class="material-icons clean-block">delete</span>';
         }
 
         block.data('id', skillId);
@@ -353,7 +369,15 @@
                 method: 'GET',
                 dataType: 'json',
                 beforeSend: function() {
-                    new Dialogify('<p>讀取中...</p>', {closable: false}).showModal();
+                    var darkMode = Cookies.get('darkMode');
+                    options = {closable: false};
+                    if (darkMode == 1) {
+                        options = {
+                            closable: false,
+                            size: 'dark-mode',
+                        };
+                    }
+                    new Dialogify('<p>讀取中...</p>', options).showModal();
                 }
             }).done(function (data) {
                 skillInfo = data;
@@ -376,7 +400,11 @@
         html += '<hr>';
         html += '<p class="fs-5">出處：' + data.from + '</p>';
 
-        var dialog = new Dialogify('#skill-info-template');
+        var options = {};
+        if (Cookies.get('darkMode') == 1) {
+            options = {size: 'dark-mode'};
+        }
+        var dialog = new Dialogify('#skill-info-template', options);
         dialog.$content.find('.info').html(html);
         dialog.showModal();
     };
@@ -501,6 +529,24 @@
         Dialogify.alert('複製成功');
     };
 
+    var toggleDarkMode = function () {
+        var darkMode = Cookies.get('darkMode');
+
+        if (darkMode == 1) {
+            Cookies.set('darkMode', 0);
+            $('#light-switch').text('關燈');
+            $('#light-switch').addClass('link-secondary');
+            $('#light-switch').removeClass('link-light');
+            $('body').removeClass('dark-mode');
+        } else {
+            Cookies.set('darkMode', 1);
+            $('#light-switch').text('開燈');
+            $('#light-switch').removeClass('link-secondary');
+            $('#light-switch').addClass('link-light');
+            $('body').addClass('dark-mode');
+        }
+    };
+
     window.getSkillInfo = getSkillInfo;
     window.clearBingo = clearBingo;
     window.saveBingo = saveBingo;
@@ -508,4 +554,5 @@
     window.loadBingoToBlock = loadBingoToBlock;
     window.delBingo = delBingo;
     window.copyUrl = copyUrl;
-}) (window, jQuery);
+    window.toggleDarkMode = toggleDarkMode;
+}) (window, jQuery, Cookies);

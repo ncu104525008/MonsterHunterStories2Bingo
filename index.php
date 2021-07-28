@@ -16,6 +16,12 @@
     <div class="container-fluid" style="margin-top: 50px;">
         <div class="row">
             <div class="col-lg-1"></div>
+            <div class="col-lg-11">
+                <a id="light-switch" href="javascript:;" class="link-secondary" onclick="toggleDarkMode();">關燈</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-1"></div>
             <div class="col-12 col-lg-4">
                 <div class="row">
                     <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
@@ -38,10 +44,10 @@
                     <div class="col"><button class="btn btn-secondary" onclick="loadBingo();">讀取</button></div>
                 </div>
                 <div class="row" style="margin-top: 20px;">
-                    <div class="col-10">
+                    <div class="col-lg-10 col-8">
                         <input id="share-url" type="text" class="form-control" readonly>
                     </div>
-                    <div class="col-2">
+                    <div class="col-lg-2 col-4">
                         <button class="btn btn-primary" onclick="copyUrl();">複製</button>
                     </div>
                 </div>
@@ -113,6 +119,7 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/js.cookie.min.js"></script>
     <script src="js/dialogify.min.js"></script>
     <script src="js/main.js"></script>
     <script id="skill-info-template" type="text/template">

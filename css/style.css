@@ -46,3 +46,8 @@
     transform: translateY(-50%);
     text-align: center;
 }
+
+.dark-mode {
+    background: var(--bs-dark);
+    color: #C8C8C8;
+}

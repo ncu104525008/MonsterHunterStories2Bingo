@@ -1,3 +1,6 @@
+<?php
+    require_once('config.php');
+?>
 <!DOCTYPE html>
 <html lang="zh-TW-Hant">
 <head>
@@ -13,7 +16,7 @@
     <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
 </head>
 <body>
-    <div class="container-fluid" style="margin-top: 50px;">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-lg-1"></div>
             <div class="col-lg-11">
@@ -22,71 +25,80 @@
         </div>
         <div class="row">
             <div class="col-lg-1"></div>
-            <div class="col-12 col-lg-4">
+            <div class="col-12 col-lg-7">
                 <div class="row">
-                    <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                    <div class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                    <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                </div>
-                <div class="row">
-                    <div class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                    <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                    <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                </div>
-                <div class="row">
-                    <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                    <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                    <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                </div>
-                <div class="row" style="margin-top: 20px;">
-                    <div class="col"><button class="btn btn-secondary" onclick="clearBingo();">清空</button></div>
-                    <div class="col"><button class="btn btn-secondary" onclick="saveBingo();">儲存</button></div>
-                    <div class="col"><button class="btn btn-secondary" onclick="loadBingo();">讀取</button></div>
-                </div>
-                <div class="row" style="margin-top: 20px;">
-                    <div class="col-lg-10 col-8">
-                        <input id="share-url" type="text" class="form-control" readonly>
+                    <div class="col-sm-12 col-lg-9">
+                        <div class="row">
+                            <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                        </div>
+                        <div class="row">
+                            <div class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                        </div>
+                        <div class="row">
+                            <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                        </div>
+                        <div class="row" style="margin-top: 20px; text-align:center;">
+                            <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="clearBingo();">清 空</button></div>
+                            <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="saveBingo();">儲 存</button></div>
+                            <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="loadBingo();">讀 取</button></div>
+                        </div>
+                        <div class="col-12" style="margin-top: 20px; display:inline-flex">
+                            <input id="share-url" type="text" class="form-control"  style="width:85%; max-width: calc( 100% - 80px );border-top-right-radius: 0px;border-bottom-right-radius: 0px;" readonly>
+                            <button class="btn btn-primary" onclick="copyUrl();" style="width:15%; min-width: 80px;border-top-left-radius: 0px;border-bottom-left-radius: 0px;">複製</button>
+                        </div>
+                        <hr>
+
                     </div>
-                    <div class="col-lg-2 col-4">
-                        <button class="btn btn-primary" onclick="copyUrl();">複製</button>
+                    <div class="col-sm-12 col-lg-3">
+                        <div class="row bingo">
+                            <div class="col-12">屬性</div>
+                                <div class="row content-indent">
+                                    <?php
+                                        foreach(TYPES_LIST_SHORT as $eachTypeKey => $eachShortName) {
+                                            echo "<div class='col-4 col-lg-12' data-bingo-type='type' data-feature-key='{$eachTypeKey}'>{$eachShortName}：<label class='bingo-value'>100</label>%</div>";
+                                        }
+                                    ?>
+                                </div>
+                            <div class="col-12"><hr></div>
+                            <div class="col-12">猜拳</div>
+                                <div class="row content-indent">
+                                    <?php
+                                        foreach(ATTRS_LIST as $eachAttrKey => $eachName) {
+                                            if ($eachAttrKey == ATTR_NONE) {
+                                                continue;
+                                            }
+                                            echo "<div class='col-4 col-lg-12' data-bingo-type='attr' data-feature-key='{$eachAttrKey}'>{$eachName}：<label class='bingo-value'>100</label>%</div>";
+                                        }
+                                    ?>
+                                </div>
+                            <div class="col-12"><hr></div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-3">
-                <div class="row bingo">
-                    <div class="col-12">屬性</div>
-                    <div class="col-12">無：100%</div>
-                    <div class="col-12">火：100%</div>
-                    <div class="col-12">水：100%</div>
-                    <div class="col-12">雷：100%</div>
-                    <div class="col-12">冰：100%</div>
-                    <div class="col-12">龍：100%</div>
-                    <div class="col-12"><hr></div>
-                    <div class="col-12">猜拳</div>
-                    <div class="col-12">力量：100%</div>
-                    <div class="col-12">技巧：100%</div>
-                    <div class="col-12">速度：100%</div>
-                </div>
-            </div>
             <div class="col-12 col-lg-4">
                 <div class="row">
-                    <div class="col">
-                        屬性：
-                        <button class="btn btn-outline-secondary filter-btn" data-color="secondary" data-id="1" data-type="type">無</button>
-                        <button class="btn btn-outline-danger filter-btn" data-color="danger" data-id="2" data-type="type">火</button>
-                        <button class="btn btn-outline-primary filter-btn" data-color="primary" data-id="3" data-type="type">水</button>
-                        <button class="btn btn-outline-warning filter-btn" data-color="warning" data-id="4" data-type="type">雷</button>
-                        <button class="btn btn-outline-info filter-btn" data-color="info" data-id="5" data-type="type">冰</button>
-                        <button class="btn btn-outline-purple filter-btn" data-color="purple" data-id="6" data-type="type">龍</button>
+                    <div class="col" style="text-indent: -3em;margin-left: 3em;">
+                        <span style="width:3em">屬性：</span><?php
+                            foreach(TYPES_LIST_SHORT as $eachTypeKey => $eachShortName) {
+                                echo "<button class='btn btn-outline-default type-{$eachTypeKey} filter-btn' data-color='secondary' data-id='{$eachTypeKey}' data-type='type'>$eachShortName</button>";
+                            }
+                        ?>
                     </div>
                 </div>
-                <div class="row" style="margin-top: 5px;">
-                    <div class="col">
-                        猜拳：
-                        <button class="btn btn-outline-secondary filter-btn" data-color="secondary" data-id="4" data-type="attr">無</button>
-                        <button class="btn btn-outline-danger filter-btn" data-color="danger" data-id="1" data-type="attr">力量</button>
-                        <button class="btn btn-outline-success filter-btn" data-color="success" data-id="2" data-type="attr">技巧</button>
-                        <button class="btn btn-outline-primary filter-btn" data-color="primary" data-id="3" data-type="attr">速度</button>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col" style="text-indent: -3em;margin-left: 3em;">
+                        <span style="width:3em">猜拳：</span><?php
+                            foreach(ATTRS_LIST as $eachAttrKey => $eachName) {
+                                echo "<button class='btn btn-outline-default attr-{$eachAttrKey} filter-btn' data-color='secondary' data-id='{$eachAttrKey}' data-type='attr'>$eachName</button>";
+                            }
+                        ?>
                     </div>
                 </div>
                 <div class="row" style="margin-top: 5px;">

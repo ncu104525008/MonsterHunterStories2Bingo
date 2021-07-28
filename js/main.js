@@ -168,6 +168,10 @@
         skills = skills.slice(0, 9);
 
         $.each(skills, function (k, v) {
+            if (v === 'NaN' || isNaN(v)) {
+                v = 0;
+            }
+
             setBlock($('.block-' + (k+1)), v);
             disableSkill(v);
         });
@@ -177,9 +181,13 @@
         var skillSelected = $('.skill.btn-secondary:enabled');
         var blockSelected = $('.block.is-selected');
         var blockClick = $(e.target);
-        if (blockClick.hasClass('block') === false) {
-            blockClick = blockClick.parent();
+
+        for (var i=0;i<2;i++) {
+            if (blockClick.hasClass('block') === false) {
+                blockClick = blockClick.parent();
+            }
         }
+
         if (skillSelected.length > 0) {
             var nowId = parseInt(blockClick.data('id'), 10);
 

@@ -23,9 +23,10 @@
     });
 
     var resizeBlock = function () {
+        var h = $('.block').eq(0).width();
         blocks.each(function () {
             var o = $(this);
-            o.css('height', o.width() + 'px');
+            o.css('height', h + 'px');
         });
     };
 

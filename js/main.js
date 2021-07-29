@@ -37,7 +37,7 @@
             dataType: 'json',
         }).done(function (data) {
             var html = '';
-            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-attr="-1"><img class="icon" src="images/icon/-1/-1.png"> ' + data[-1][-1][0].name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(1);">help_outline</span></div>';
+            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-action="-1"><img class="icon" src="images/icon/-1/-1.png"> ' + data[-1][-1][0].name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(1);">help_outline</span></div>';
 
             for (var i=1;i<=6;i++) {
                 for (var j=1;j<=4;j++) {
@@ -61,7 +61,7 @@
                             t += ' data-name="' + tmp[1] + '" data-level="' + level + '"';
                         }
 
-                        html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-attr="' + j + '" data-type2="' + v.type2 + '"' + t + '><img class="icon" src="images/icon/' + j + '/' + i + '.png"> ' + v.name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(' + v.id + ');">help_outline</span></div>';
+                        html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + v.id + '" data-id="' + v.id + '" data-type="' + i + '" data-action="' + j + '" data-type2="' + v.type2 + '"' + t + '><img class="icon" src="images/icon/' + j + '/' + i + '.png"> ' + v.name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(' + v.id + ');">help_outline</span></div>';
                     });
                 }
             }
@@ -108,24 +108,24 @@
     var filterSkill = function () {
         $('.skill').removeClass('is-hide');
         $('.skill').parent().hide();
-        $('.skill[data-type=-1][data-attr=-1]').parent().show();
+        $('.skill[data-type=-1][data-action=-1]').parent().show();
 
         var types = $('.filter-btn.is-checked[data-type=type]');
-        var attrs = $('.filter-btn.is-checked[data-type=attr]');
+        var actions = $('.filter-btn.is-checked[data-type=action]');
         var showSkillType = parseInt($('[name=showSkillType]:checked').val(), 10);
 
         types.each(function () {
             var type = $(this);
-            attrs.each(function () {
-                var attr = $(this);
+            actions.each(function () {
+                var action = $(this);
 
                 var selector = '';
                 if (showSkillType === 2) {
-                    selector = '.skill[data-type=' + type.data('id') + '][data-attr=' + attr.data('id') + '][data-type2=主動]';
+                    selector = '.skill[data-type=' + type.data('id') + '][data-action=' + action.data('id') + '][data-type2=主動]';
                 } else if (showSkillType === 3) {
-                    selector = '.skill[data-type=' + type.data('id') + '][data-attr=' + attr.data('id') + '][data-type2=被動]';
+                    selector = '.skill[data-type=' + type.data('id') + '][data-action=' + action.data('id') + '][data-type2=被動]';
                 } else {
-                    selector = '.skill[data-type=' + type.data('id') + '][data-attr=' + attr.data('id') + ']';
+                    selector = '.skill[data-type=' + type.data('id') + '][data-action=' + action.data('id') + ']';
                 }
                 $(selector).parent().show();
             });
@@ -231,19 +231,19 @@
     var setBlock = function (block, skillId) {
         skillId = parseInt(skillId, 10);
         var type = 0;
-        var attr = 0;
+        var action = 0;
         var name = '請先選擇基因';
 
         if (skillId !== 0) {
             var skill = $('.skill-' + skillId);
             type = skill.data('type');
-            attr = skill.data('attr');
+            action = skill.data('action');
             name = skill.html() + '<span class="material-icons clean-block">delete</span>';
         }
 
         block.data('id', skillId);
         block.data('type', type);
-        block.data('attr', attr);
+        block.data('action', action);
         block.html('<div>' + name + '</div>');
 
         checkBingo();
@@ -280,7 +280,7 @@
 
     var checkBingo = function () {
         var type = [];
-        var attr = [];
+        var action = [];
 
         for (var i=1;i<=8;i++) {
             var blockInLine = $('.line-' + i);
@@ -302,23 +302,23 @@
                 type.push(type1);
             }
 
-            var attr1 = parseInt(block1.data('attr'));
-            var attr2 = parseInt(block2.data('attr'));
-            var attr3 = parseInt(block3.data('attr'));
+            var action1 = parseInt(block1.data('action'));
+            var action2 = parseInt(block2.data('action'));
+            var action3 = parseInt(block3.data('action'));
 
-            if (attr1 === attr2 && attr2 === attr3) {
-                attr.push(attr1);
-            } else if (attr1 === -1 && attr2 === attr3) {
-                attr.push(attr2);
-            } else if (attr2 === -1 && attr1 === attr3) {
-                attr.push(attr1);
-            } else if (attr3 === -1 && attr1 === attr2) {
-                attr.push(attr1);
+            if (action1 === action2 && action2 === action3) {
+                action.push(action1);
+            } else if (action1 === -1 && action2 === action3) {
+                action.push(action2);
+            } else if (action2 === -1 && action1 === action3) {
+                action.push(action1);
+            } else if (action3 === -1 && action1 === action2) {
+                action.push(action1);
             }
         }
 
         var typeText = {1: '無', 2: '火', 3: '水', 4: '雷', 5: '冰', 6: '龍'};
-        var attrText = {1: '力量', 2: '技巧', 3: '速度', 4: '無'};
+        var actionText = {1: '力量', 2: '技巧', 3: '速度', 4: '無'};
 
         var count = {};
         for (var i=0;i<type.length;i++) {
@@ -346,8 +346,8 @@
         }
 
         count = {};
-        for (var i=0;i<attr.length;i++) {
-            count[attr[i]] = count[attr[i]] ? count[attr[i]] + 1 : 1;
+        for (var i=0;i<action.length;i++) {
+            count[action[i]] = count[action[i]] ? count[action[i]] + 1 : 1;
         }
 
         for (var i=1;i<=3;i++) {
@@ -361,7 +361,7 @@
             }
 
 
-            var target = $('div[data-bingo-type=attr][data-feature-key='+i+']').find('.bingo-value');
+            var target = $('div[data-bingo-type=action][data-feature-key='+i+']').find('.bingo-value');
             if (rate > 100) {
                 target.addClass('match-bingo');
             } else {

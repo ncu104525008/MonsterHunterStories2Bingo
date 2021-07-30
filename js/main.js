@@ -195,14 +195,12 @@
                         });
                     }
                     sortKey.push(String(bingoSum).padStart('2', '0')); // 因為要轉成字串做排序，所以數字的位數必須一致
-                    // console.log(sortKey);
                     sortKey = sortKey.join('#');
                     sortMap[sortKey] = sortMap[sortKey]?sortMap[sortKey]:[];
                     sortMap[sortKey].push(history);
                 }
             }
         }
-        console.log("帶有賓果的組合數/ 總組合數: "+Object.keys(mainMap).length+"/ "+totalMap);
 
         // 取出具最優解的 key (最符合指定排序者)
         var max = Object.keys(sortMap).sort().pop();

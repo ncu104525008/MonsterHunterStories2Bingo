@@ -29,31 +29,70 @@
                 <div class="row">
                     <div class="col-sm-12 col-lg-9">
                         <div class="row">
-                            <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                            <div class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                            <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
                         </div>
                         <div class="row">
-                            <div class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                            <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                            <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
                         </div>
                         <div class="row">
-                            <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                            <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
-                            <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="0" data-attr="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
+                            <div class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="0" data-action="0"><div>請先選擇基因</div></div>
                         </div>
                         <div class="row" style="margin-top: 20px; text-align:center;">
                             <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="clearBingo();">清 空</button></div>
                             <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="saveBingo();">儲 存</button></div>
                             <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="loadBingo();">讀 取</button></div>
                         </div>
-                        <div class="col-12" style="margin-top: 20px; display:inline-flex">
-                            <input id="share-url" type="text" class="form-control"  style="width:85%; max-width: calc( 100% - 80px );border-top-right-radius: 0px;border-bottom-right-radius: 0px;" readonly>
-                            <button class="btn btn-primary" onclick="copyUrl();" style="width:15%; min-width: 80px;border-top-left-radius: 0px;border-bottom-left-radius: 0px;">複製</button>
+                        <div class="row" style="margin-top: 20px; text-align:center">
+                            <div class="col-12" style="display:inline-flex">
+                                <div style="width:110px;line-height: 2.2em;font-size: 1em; text-align:left">自動排列：</div>
+                                <div style="width:calc( ( 100% - 230px ) / 2 ); min-width:calc( ( 85% - 110px ) / 2); padding-right:10px">
+                                    <select class="form-control" id="calc-sort-1">
+                                        <option value="_sum-">賓果總數最多 優先</option>
+                                        <?php
+                                            foreach(ACTIONS_LIST as $featureKey => $each) {
+                                                if ($featureKey == ACTION_NONE) {
+                                                    continue;
+                                                }
+                                                echo "<option value='action-{$featureKey}'>{$each}猜拳 優先</option>";
+                                            }
+                                            foreach(TYPES_LIST as $featureKey => $each) {
+                                                echo "<option value='type-{$featureKey}'>{$each} 優先</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div style="width:calc( ( 100% - 230px ) / 2 ); min-width:calc( ( 85% - 110px ) / 2); padding-right:10px">
+                                    <select class="form-control" id="calc-sort-2">
+                                        <option value="_sum-">賓果總數最多 優先</option>
+                                        <?php
+                                            foreach(ACTIONS_LIST as $featureKey => $each) {
+                                                if ($featureKey == ACTION_NONE) {
+                                                    continue;
+                                                }
+                                                echo "<option value='action-{$featureKey}'>{$each}猜拳 優先</option>";
+                                            }
+                                            foreach(TYPES_LIST as $featureKey => $each) {
+                                                echo "<option value='type-{$featureKey}'>{$each} 優先</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <button class="btn btn-secondary btn-sl" onclick="autoCalc();" style="width: 120px; max-width: 15%">送出</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12" style="margin-top: 20px; display:inline-flex">
+                                <input id="share-url" type="text" class="form-control"  style="width:85%; max-width: calc( 100% - 80px );border-top-right-radius: 0px;border-bottom-right-radius: 0px;" readonly>
+                                <button class="btn btn-primary" onclick="copyUrl();" style="width:15%; min-width: 80px;border-top-left-radius: 0px;border-bottom-left-radius: 0px;">複製</button>
+                            </div>
                         </div>
                         <hr>
-
                     </div>
                     <div class="col-sm-12 col-lg-3">
                         <div class="row bingo">
@@ -69,11 +108,11 @@
                             <div class="col-12">猜拳</div>
                                 <div class="row content-indent">
                                     <?php
-                                        foreach(ATTRS_LIST as $eachAttrKey => $eachName) {
-                                            if ($eachAttrKey == ATTR_NONE) {
+                                        foreach(ACTIONS_LIST as $eachActionKey => $eachName) {
+                                            if ($eachActionKey == ACTION_NONE) {
                                                 continue;
                                             }
-                                            echo "<div class='col-4 col-lg-12' data-bingo-type='attr' data-feature-key='{$eachAttrKey}'>{$eachName}：<label class='bingo-value'>100</label>%</div>";
+                                            echo "<div class='col-4 col-lg-12' data-bingo-type='action' data-feature-key='{$eachActionKey}'>{$eachName}：<label class='bingo-value'>100</label>%</div>";
                                         }
                                     ?>
                                 </div>
@@ -95,8 +134,8 @@
                 <div class="row" style="margin-top: 10px;">
                     <div class="col" style="text-indent: -3em;margin-left: 3em;">
                         <span style="width:3em">猜拳：</span><?php
-                            foreach(ATTRS_LIST as $eachAttrKey => $eachName) {
-                                echo "<button class='btn btn-outline-default attr-{$eachAttrKey} filter-btn' data-color='secondary' data-id='{$eachAttrKey}' data-type='attr'>$eachName</button>";
+                            foreach(ACTIONS_LIST as $eachActionKey => $eachName) {
+                                echo "<button class='btn btn-outline-default action-{$eachActionKey} filter-btn' data-color='secondary' data-id='{$eachActionKey}' data-type='action'>$eachName</button>";
                             }
                         ?>
                     </div>

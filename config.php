@@ -26,20 +26,20 @@
         TYPE_DRAGOND => '龍',
     );
 
-    const  ATTR_POWER = 1;
-    const  ATTR_SKILL = 2;
-    const  ATTR_SPEED = 3;
-    const  ATTR_NONE = 4;
+    const  ACTION_POWER = 1;
+    const  ACTION_SKILL = 2;
+    const  ACTION_SPEED = 3;
+    const  ACTION_NONE = 4;
 
-    const  ATTRS_LIST = array(
-        ATTR_NONE => '無',
-        ATTR_POWER => '力量',
-        ATTR_SKILL => '技巧',
-        ATTR_SPEED => '速度',
+    const  ACTIONS_LIST = array(
+        ACTION_NONE => '無',
+        ACTION_POWER => '力量',
+        ACTION_SKILL => '技巧',
+        ACTION_SPEED => '速度',
     );
-    const  ATTRS_LIST_SHORT = array(
-        ATTR_NONE => '無',
-        ATTR_POWER => '力',
-        ATTR_SKILL => '技',
-        ATTR_SPEED => '速',
+    const  ACTIONS_LIST_SHORT = array(
+        ACTION_NONE => '無',
+        ACTION_POWER => '力',
+        ACTION_SKILL => '技',
+        ACTION_SPEED => '速',
     );

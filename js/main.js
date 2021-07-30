@@ -482,6 +482,10 @@
     };
 
     var loadBingoToBlock = function (id) {
+        $('.skill:disabled').each(function () {
+            enableSkill($(this).data('id'));
+        });
+
         var bingoData = getBingoData();
         var skills = bingoData[id].skills;
 

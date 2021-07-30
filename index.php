@@ -48,9 +48,49 @@
                             <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="saveBingo();">儲 存</button></div>
                             <div class="col-4"><button class="btn btn-secondary btn-sl" onclick="loadBingo();">讀 取</button></div>
                         </div>
-                        <div class="col-12" style="margin-top: 20px; display:inline-flex">
-                            <input id="share-url" type="text" class="form-control"  style="width:85%; max-width: calc( 100% - 80px );border-top-right-radius: 0px;border-bottom-right-radius: 0px;" readonly>
-                            <button class="btn btn-primary" onclick="copyUrl();" style="width:15%; min-width: 80px;border-top-left-radius: 0px;border-bottom-left-radius: 0px;">複製</button>
+                        <div class="row" style="margin-top: 20px; text-align:center">
+                            <div class="col-12" style="display:inline-flex">
+                                <div style="width:110px;line-height: 2.2em;font-size: 1em; text-align:left">自動排列：</div>
+                                <div style="width:calc( ( 100% - 230px ) / 2 ); min-width:calc( ( 85% - 110px ) / 2); padding-right:10px">
+                                    <select class="form-control" id="calc-sort-1">
+                                        <option value="_sum-">賓果總數最多 優先</option>
+                                        <?php
+                                            foreach(ACTIONS_LIST as $featureKey => $each) {
+                                                if ($featureKey == ACTION_NONE) {
+                                                    continue;
+                                                }
+                                                echo "<option value='action-{$featureKey}'>{$each}猜拳 優先</option>";
+                                            }
+                                            foreach(TYPES_LIST as $featureKey => $each) {
+                                                echo "<option value='type-{$featureKey}'>{$each} 優先</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div style="width:calc( ( 100% - 230px ) / 2 ); min-width:calc( ( 85% - 110px ) / 2); padding-right:10px">
+                                    <select class="form-control" id="calc-sort-2">
+                                        <option value="_sum-">賓果總數最多 優先</option>
+                                        <?php
+                                            foreach(ACTIONS_LIST as $featureKey => $each) {
+                                                if ($featureKey == ACTION_NONE) {
+                                                    continue;
+                                                }
+                                                echo "<option value='action-{$featureKey}'>{$each}猜拳 優先</option>";
+                                            }
+                                            foreach(TYPES_LIST as $featureKey => $each) {
+                                                echo "<option value='type-{$featureKey}'>{$each} 優先</option>";
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <button class="btn btn-secondary btn-sl" onclick="autoCalc();" style="width: 120px; max-width: 15%">送出</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12" style="margin-top: 20px; display:inline-flex">
+                                <input id="share-url" type="text" class="form-control"  style="width:85%; max-width: calc( 100% - 80px );border-top-right-radius: 0px;border-bottom-right-radius: 0px;" readonly>
+                                <button class="btn btn-primary" onclick="copyUrl();" style="width:15%; min-width: 80px;border-top-left-radius: 0px;border-bottom-left-radius: 0px;">複製</button>
+                            </div>
                         </div>
                         <hr>
                     </div>

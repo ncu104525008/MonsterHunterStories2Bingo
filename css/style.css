@@ -132,3 +132,14 @@
     margin-top: 5px;
     margin-left: 5px;
 }
+.demo-block {
+    height: auto;
+    aspect-ratio: 1 / 1;
+    text-align: center;
+    border: solid 1px gray;
+    padding: 3%;
+}
+.demo-block img {
+    width: 100%;
+    height: auto;
+}

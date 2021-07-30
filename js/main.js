@@ -239,67 +239,78 @@
         ];
         var lock = []; // 未實作
         var show = CALC_BINGO_SHOW_DEFAULT;
-        var calcResult = calcBingo(skill, sort, lock, show);
 
-        if (!calcResult['success']) {
-            Dialogify.alert('分析失敗: '+calcResult['msg']);
-        } else {
-            var html='';
-            html+= '<div class="row">';
-            $.each(calcResult['data'], function(map, bingoInfo) {
-                html+='<div class="col-sm-12 col-md-6"><div class="row" style="margin-bottom:20px">';
-                html+='<div class="col-6">';
-                // 切割為陣列
-                var mapArr = map.split(CALC_BINGO_SP_BLOCK);
-                var newSkillParm = [];
-                var tmpSkill = Object.assign({}, skill);
-                var mapHtml = '<div class="row" >';
-                $.each(mapArr, function(doesntmatter, feature) {
-                    var featureData = feature.split(CALC_BINGO_SP_FEATURE);
-                    var type = featureData[0];
-                    var action = featureData[1];
-                    mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>';
+        var calcing = new Dialogify('<div style="text-align: center;margin-top: 25px;"><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>');
+        calcing.title('計算中請稍候...');
+        calcing.showModal();
 
-                    // 建立新的 url Parm
-                    $.each(tmpSkill, function(skillKey, skillID) {
-                        if (getFeatureKey(skillID) != feature) {
-                            return;
-                        }
-                        newSkillParm.push(skillID);
-                        delete(tmpSkill[skillKey]);
-                        return false;
+        // delay 10 ms 後才動作，避免這邊的運算和 Dialogify 撞在一起，loading 會 show 不出來
+        setTimeout(function(){
+            var calcResult = calcBingo(skill, sort, lock, show);
+
+            if (!calcResult['success']) {
+                Dialogify.alert('分析失敗: '+calcResult['msg']);
+            } else {
+                var html='';
+                html+= '<div class="row">';
+                $.each(calcResult['data'], function(map, bingoInfo) {
+                    html+='<div class="col-sm-12 col-md-6"><div class="row" style="margin-bottom:20px">';
+                    html+='<div class="col-6">';
+                    // 切割為陣列
+                    var mapArr = map.split(CALC_BINGO_SP_BLOCK);
+                    var newSkillParm = [];
+                    var tmpSkill = Object.assign({}, skill);
+                    var mapHtml = '<div class="row" >';
+                    $.each(mapArr, function(doesntmatter, feature) {
+                        var featureData = feature.split(CALC_BINGO_SP_FEATURE);
+                        var type = featureData[0];
+                        var action = featureData[1];
+                        mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>';
+
+                        // 建立新的 url Parm
+                        $.each(tmpSkill, function(skillKey, skillID) {
+                            if (getFeatureKey(skillID) != feature) {
+                                return;
+                            }
+                            newSkillParm.push(skillID);
+                            delete(tmpSkill[skillKey]);
+                            return false;
+                        });
                     });
+                    mapHtml+='</div>';
+                    html+= '<a href="?skills='+(newSkillParm.join(','))+'">'+mapHtml+'</a>';
+                    html+= '</div>';
+
+                    var bingoInfoString = [];
+                    $.each(FEATURE_INDEX, function(featureRoot, featureData) {
+                        $.each(featureData, function(featureKey, featureName) {
+                            if (!bingoInfo[featureRoot] || ! bingoInfo[featureRoot][featureKey]) {
+                                return;
+                            }
+                            var bingoNum = bingoInfo[featureRoot][featureKey];
+                            var rootName = FEATURE_ROOT_NAME[featureRoot];
+                            var str = featureName+' '+rootName+': x'+bingoNum;
+                            bingoInfoString.push(str);
+                        });
+                    })
+                    bingoInfoString = bingoInfoString.join('<br>', bingoInfoString);
+                    html+= '<div class="col-6"><div>賓果結果:<p style="margin-left:5px;margin-top:10px;">'+bingoInfoString+'</p></div></div>';
+                    html+= '</div></div>';
                 });
-                mapHtml+='</div>';
-                html+= '<a href="?skills='+(newSkillParm.join(','))+'">'+mapHtml+'</a>';
-                html+= '</div>';
+                html+='</div>';
 
-                var bingoInfoString = [];
-                $.each(FEATURE_INDEX, function(featureRoot, featureData) {
-                    $.each(featureData, function(featureKey, featureName) {
-                        if (!bingoInfo[featureRoot] || ! bingoInfo[featureRoot][featureKey]) {
-                            return;
-                        }
-                        var bingoNum = bingoInfo[featureRoot][featureKey];
-                        var rootName = FEATURE_ROOT_NAME[featureRoot];
-                        var str = featureName+' '+rootName+': x'+bingoNum;
-                        bingoInfoString.push(str);
-                    });
-                })
-                bingoInfoString = bingoInfoString.join('<br>', bingoInfoString);
-                html+= '<div class="col-6"><div>賓果結果:<p style="margin-left:5px;margin-top:10px;">'+bingoInfoString+'</p></div></div>';
-                html+= '</div></div>';
-            });
-            html+='</div>';
+                var dailog = new Dialogify('<div style="width: 90%; margin: 0 auto;">'+html+'</div>', {
+                    size: 'demo-dialog',
+                });
+                dailog.on('show', function(){
+                    calcing.close();
+                });
+                dailog.title('計算結果');
+                dailog.showModal();
+            }
+        }, 10);
 
-
-            var dailog = new Dialogify('<div style="width: 90%; margin: 0 auto;">'+html+'</div>', {
-                size: 'demo-dialog',
-            });
-            dailog.title('計算結果');
-            dailog.showModal();
-        }
-
+        return;
     }
 
 
@@ -317,7 +328,7 @@
     });
 
     var resizeBlock = function () {
-        var h = $('.block').eq(0).width();
+        var h = $('.block').eq(0).outerWidth()
         blocks.each(function () {
             var o = $(this);
             o.css('height', h + 'px');

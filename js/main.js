@@ -28,7 +28,8 @@
         [1,5,9],
         [3,5,7],
     ];
-    const CALC_BINGO_SHOW_DEFAULT = 6; // 計算完賓果後，預設只顯示五組
+    const CALC_BINGO_SHOW_DEFAULT = 6; // 計算完賓果後，共顯示幾個圖形
+    const CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT = 2  // 計算完賓果後，每次從每組最佳解中最多取出多少圖形
     const CALC_BINGO_SP_FEATURE = '_';
     const CALC_BINGO_SP_BLOCK = ', ';
 
@@ -83,9 +84,11 @@
             }
         }
 
+        var lockData = new Array(9);
+
         // 把基因內容進行分類
         var featureGroup = {};
-        $.each(input, function(doesntmatter, skillID) {
+        $.each(input, function(key, skillID) {
 
             // 取得特徵的key
             var featureKey = getFeatureKey(skillID);
@@ -97,9 +100,12 @@
                     msg: '不存在的基因資料? ('+skillID+')',
                 }
             }
-
-            featureGroup[featureKey] = !!featureGroup[featureKey]?featureGroup[featureKey]:[];
-            featureGroup[featureKey].push(skillID);
+            if (lock.indexOf(key+1) >= 0) { // 陣列是 0 起算的，但 blockID 是1 起算，所以要+1 補正
+                lockData[key] = featureKey;
+            } else {
+                featureGroup[featureKey] = !!featureGroup[featureKey]?featureGroup[featureKey]:[];
+                featureGroup[featureKey].push(skillID);
+            }
         });
 
         var mainMap={};
@@ -132,6 +138,12 @@
             } else {
                 var result = {};
                 var historyData = history.split(CALC_BINGO_SP_BLOCK);
+                $.each(lockData, function(key, eachLockTmp){
+                    if (!!eachLockTmp) {
+                        historyData.splice(key, 0, eachLockTmp);
+                    }
+                });
+                history = historyData.join(CALC_BINGO_SP_BLOCK);
                 var bingoSum = 0;
                 $.each(bingoRule, function(bingoRuleKey, eachRule) {
                     var featureTypeMatch = {};
@@ -203,19 +215,29 @@
         }
 
         // 取出具最優解的 key (最符合指定排序者)
-        var max = Object.keys(sortMap).sort().pop();
+        if ($.isEmptyObject(sortMap)) {
+            return {
+                success: false,
+                msg: '找不到最優解',
+            }
+        }
+        var sortReverse = Object.keys(sortMap).sort().reverse();
 
-        // 取出最優解們
-        var maxGroup = sortMap[max];
-
-        // 好了準備把資料送回去了
         var bestSolution = {};
-        $.each(maxGroup, function(key, mapResult) {
-            if (key >= show) {
+        $.each(sortReverse, function(doesntmatter, mapKey) {
+            if (Object.keys(bestSolution).length >= show) {
                 return false;
             }
-            bestSolution[mapResult] = mainMap[mapResult];
+            var mapGroup = sortMap[mapKey];
+            $.each(mapGroup, function(conut, mapResult){
+                // 每個最佳解群集只取 CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT 個
+                if (conut >= CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT) {
+                    return false;
+                }
+                bestSolution[mapResult] = mainMap[mapResult];
+            });
         });
+
         return {
             success: true,
             msg: '分析成功',
@@ -230,6 +252,14 @@
         }
         return featureData.type+CALC_BINGO_SP_FEATURE+featureData.acction;
     }
+    function getLock() {
+        var lock = [];
+        $('.block span.lock.is-lock').each(function(){
+            var blockID = $(this).parents('.block').attr('id').replace(/^[^\d]+/,'');
+            lock.push(parseInt(blockID));
+        })
+        return lock;
+    }
 
     function autoCalc() {
         var skill = getSkillFromDiv(); // 取得頁面中的基因格資訊
@@ -237,69 +267,96 @@
             $('#calc-sort-1').val().split('-'),
             $('#calc-sort-2').val().split('-'),
         ];
-        var lock = []; // 未實作
+        var lock = getLock();
         var show = CALC_BINGO_SHOW_DEFAULT;
-        var calcResult = calcBingo(skill, sort, lock, show);
 
-        if (!calcResult['success']) {
-            Dialogify.alert('分析失敗: '+calcResult['msg']);
-        } else {
-            var html='';
-            html+= '<div class="row">';
-            $.each(calcResult['data'], function(map, bingoInfo) {
-                html+='<div class="col-sm-12 col-md-6"><div class="row" style="margin-bottom:20px">';
-                html+='<div class="col-6">';
-                // 切割為陣列
-                var mapArr = map.split(CALC_BINGO_SP_BLOCK);
-                var newSkillParm = [];
-                var tmpSkill = Object.assign({}, skill);
-                var mapHtml = '<div class="row" >';
-                $.each(mapArr, function(doesntmatter, feature) {
-                    var featureData = feature.split(CALC_BINGO_SP_FEATURE);
-                    var type = featureData[0];
-                    var action = featureData[1];
-                    mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>';
+        var calcing = new Dialogify('<div style="text-align: center;margin-top: 25px;"><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>');
+        calcing.title('計算中請稍候...');
+        calcing.showModal();
 
-                    // 建立新的 url Parm
-                    $.each(tmpSkill, function(skillKey, skillID) {
-                        if (getFeatureKey(skillID) != feature) {
-                            return;
-                        }
-                        newSkillParm.push(skillID);
-                        delete(tmpSkill[skillKey]);
-                        return false;
+        // delay 10 ms 後才動作，避免這邊的運算和 Dialogify 撞在一起，loading 會 show 不出來
+        setTimeout(function(){
+            var calcResult = calcBingo(skill, sort, lock, show);
+            calcing.close();
+
+            if (!calcResult['success']) {
+                Dialogify.alert('分析失敗：'+calcResult['msg']);
+            } else {
+                var html='';
+                html+= '<div class="row">';
+                $.each(calcResult['data'], function(map, bingoInfo) {
+                    html+='<div class="col-sm-12 col-md-6"><div class="row" style="margin-bottom:20px">';
+                    html+='<div class="col-6">';
+                    // 切割為陣列
+                    var mapArr = map.split(CALC_BINGO_SP_BLOCK);
+                    var newSkillParm = [];
+                    var tmpSkill = Object.assign({}, skill);
+                    var mapHtml = '<div class="row" >';
+                    $.each(mapArr, function(doesntmatter, feature) {
+                        var featureData = feature.split(CALC_BINGO_SP_FEATURE);
+                        var type = featureData[0];
+                        var action = featureData[1];
+                        mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>';
+
+                        // 建立新的 url Parm
+                        $.each(tmpSkill, function(skillKey, skillID) {
+                            if (getFeatureKey(skillID) != feature) {
+                                return;
+                            }
+                            newSkillParm.push(skillID);
+                            delete(tmpSkill[skillKey]);
+                            return false;
+                        });
                     });
+                    mapHtml+='</div>';
+                    var url = buildURL(newSkillParm, false, true);
+                    html+= '<a href="'+url+'">'+mapHtml+'</a>';
+                    html+= '</div>';
+
+                    var bingoInfoString = [];
+                    $.each(FEATURE_INDEX, function(featureRoot, featureData) {
+                        $.each(featureData, function(featureKey, featureName) {
+                            if (!bingoInfo[featureRoot] || ! bingoInfo[featureRoot][featureKey]) {
+                                return;
+                            }
+                            var bingoNum = bingoInfo[featureRoot][featureKey];
+                            var rootName = FEATURE_ROOT_NAME[featureRoot];
+                            var str = featureName+' '+rootName+': x'+bingoNum;
+                            bingoInfoString.push(str);
+                        });
+                    })
+                    bingoInfoString = bingoInfoString.join('<br>', bingoInfoString);
+                    html+= '<div class="col-6"><div>賓果結果:<p style="margin-left:5px;margin-top:10px;">'+bingoInfoString+'</p></div></div>';
+                    html+= '</div></div>';
                 });
-                mapHtml+='</div>';
-                html+= '<a href="?skills='+(newSkillParm.join(','))+'">'+mapHtml+'</a>';
-                html+= '</div>';
+                html+='</div>';
 
-                var bingoInfoString = [];
-                $.each(FEATURE_INDEX, function(featureRoot, featureData) {
-                    $.each(featureData, function(featureKey, featureName) {
-                        if (!bingoInfo[featureRoot] || ! bingoInfo[featureRoot][featureKey]) {
-                            return;
-                        }
-                        var bingoNum = bingoInfo[featureRoot][featureKey];
-                        var rootName = FEATURE_ROOT_NAME[featureRoot];
-                        var str = featureName+' '+rootName+': x'+bingoNum;
-                        bingoInfoString.push(str);
-                    });
-                })
-                bingoInfoString = bingoInfoString.join('<br>', bingoInfoString);
-                html+= '<div class="col-6"><div>賓果結果:<p style="margin-left:5px;margin-top:10px;">'+bingoInfoString+'</p></div></div>';
-                html+= '</div></div>';
-            });
-            html+='</div>';
+                var dailog = new Dialogify('<div style="width: 90%; margin: 0 auto;">'+html+'</div>', {
+                    size: 'demo-dialog',
+                });
+                dailog.title('計算結果<span class="material-icons align-text-bottom" style="cursor: pointer;margin-left:5px" onclick="calcInfo()">help_outline</span>');
+                dailog.showModal();
+            }
+        }, 10);
 
-
-            var dailog = new Dialogify('<div style="width: 90%; margin: 0 auto;">'+html+'</div>', {
-                size: 'demo-dialog',
-            });
-            dailog.title('計算結果');
-            dailog.showModal();
+        return;
+    }
+    $('.lock').on('click', function(){
+        if ($(this).parent('.block').data('id') == 0 ) {
+            return false;
         }
+        $(this).toggleClass('is-lock');
+        if ($(this).is('.is-lock')) {
+            $(this).text('lock');
+        } else {
+            $(this).text('lock_open');
+        }
+        buildURL();
+        return false;
+    })
 
+    function calcInfo() {
+        Dialogify.alert('根據你所提供的基因內容，系統目前會依據可達成的賓果圖形：<ul><li>從每種 最優解群集 中取出最多 <b>'+ CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT +'組</b> 圖形</li><li>並依據若干種最優解群集，取出當中最多總計 <b>'+ CALC_BINGO_SHOW_DEFAULT +'組</b> 圖形</li></ul>以供參考。<br><br>各圖形可點擊，點擊後會連結至對應頁面，以利進行分享/ 儲存。');
     }
 
 
@@ -317,7 +374,7 @@
     });
 
     var resizeBlock = function () {
-        var h = $('.block').eq(0).width();
+        var h = $('.block').eq(0).outerWidth()
         blocks.each(function () {
             var o = $(this);
             o.css('height', h + 'px');
@@ -465,22 +522,37 @@
     };
 
     var setDefaultSkill = function () {
-        var skills = location.search;
+        var urlParams = new URLSearchParams(window.location.search);
+        var skills = urlParams.get('skills');
+        skills = skills?skills.split(','):[];
+
+        var lock = urlParams.get('lock');
+        lock = lock?lock.split(','):[];
+
+
         if (skills.length === 0) {
             return false;
         }
-        skills = skills.split('=');
-        skills = skills[1].split(',');
-        skills = skills.slice(0, 9);
+        skill = skills.slice(0, 9);
+
+        $.each(lock, function (doesntmatter, blockID) {
+            var target = $('#block-' + blockID+' span.lock');
+            if (target.length > 0 ) {
+                target.addClass('is-lock');
+                target.text('lock');
+            }
+        });
 
         $.each(skills, function (k, v) {
             if (v === 'NaN' || isNaN(v)) {
                 v = 0;
             }
-
-            setBlock($('.block-' + (k+1)), v);
+            var blockID = k+1;
+            setBlock($('#block-' + blockID), v, false);
             disableSkill(v);
         });
+
+        buildURL();
     }
 
     var clickBlock = function (e) {
@@ -501,6 +573,12 @@
             if (blockClick.hasClass('block') === false) {
                 blockClick = blockClick.parent();
             }
+        }
+
+        if ( blockSelected.children('.lock').is('.is-lock') || blockClick.children('.lock').is('.is-lock')) {
+            Dialogify.alert('基因已經鎖定');
+            blockSelected.removeClass('is-selected');
+            return false;
         }
 
         if (skillSelected.length > 0) {
@@ -526,7 +604,8 @@
         }
     };
 
-    var setBlock = function (block, skillId) {
+    var setBlock = function (block, skillId, doBuildURL) {
+        doBuildURL = doBuildURL!==undefined?doBuildURL:true;
         skillId = parseInt(skillId, 10);
         var type = 0;
         var action = 0;
@@ -537,30 +616,40 @@
             type = skill.data('type');
             action = skill.data('action');
             name = skill.html() + '<span class="material-icons clean-block">delete</span>';
+        } else {
+            block.children('.lock').text('lock_open').removeClass('is-lock');
         }
 
         block.data('id', skillId);
         block.data('type', type);
         block.data('action', action);
-        block.html('<div>' + name + '</div>');
+        block.children('div').html(name);
 
         checkBingo();
 
-        var skills = '';
-        $('.block').each(function () {
-            var o = $(this);
-            if (skills.length === 0) {
-                skills += '' + o.data('id');
-            } else {
-                skills += ',' + o.data('id');
-            }
-        });
-
-        var url = location.protocol + '//' + location.host + location.pathname + '?skills=' + skills;
-        window.history.pushState('', '魔物基因配置模擬器', '?skills=' + skills);
-
-        $('#share-url').val(url);
+        if (doBuildURL) {
+            buildURL();
+        }
     };
+
+    function buildURL(skills, lock, justReturn) {
+        var skills = !!skills?skills:getSkillFromDiv();
+        var lock = !!lock?lock:getLock();
+        var justReturn = justReturn!==undefined?justReturn:false;
+
+
+        skills = skills.join(',')
+        lock = lock.join(',');
+
+        var url = location.protocol + '//' + location.host + location.pathname + '?skills=' + skills+ '&lock=' + lock;
+
+        if (justReturn) {
+            return url;
+        } else {
+            window.history.pushState('', '魔物基因配置模擬器', '?skills=' + skills+ '&lock=' + lock);
+            $('#share-url').val(url);
+        }
+    }
 
     var enableSkill = function (skillId) {
         var obj = $('.skill-' + skillId);
@@ -788,7 +877,7 @@
         var skills = bingoData[id].skills;
 
         $.each(skills, function (k, v) {
-            var block = $('.block-' + (k+1));
+            var block = $('#block-' + (k+1));
             setBlock(block, v);
             disableSkill(v);
         });
@@ -868,4 +957,5 @@
     window.copyUrl = copyUrl;
     window.toggleDarkMode = toggleDarkMode;
     window.autoCalc = autoCalc;
+    window.calcInfo = calcInfo;
 }) (window, jQuery, Cookies);

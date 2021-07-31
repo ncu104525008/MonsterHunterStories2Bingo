@@ -523,8 +523,12 @@
 
     var setDefaultSkill = function () {
         var urlParams = new URLSearchParams(window.location.search);
-        var skills = urlParams.get('skills').split(',');
-        var lock = urlParams.get('lock').split(',');
+        var skills = urlParams.get('skills');
+        skills = skills?skills.split(','):[];
+
+        var lock = urlParams.get('lock');
+        lock = lock?lock.split(','):[];
+
 
         if (skills.length === 0) {
             return false;

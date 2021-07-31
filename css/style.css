@@ -1,7 +1,7 @@
 .container-fluid {
     margin-top: 30px;
     width: calc( 100% - 20px );
-    max-width: 1200px;
+    max-width: 1300px;
 }
 .bingo {
     padding-left: 20px;
@@ -9,25 +9,20 @@
 .demo-dialog {
     max-height: calc( 100vh - 150px );
 }
-@media only screen and (max-width: 992px) {
-    .container-fluid {
-        margin-top: 10px;
-        width: calc( 100% - 20px );
-    }
-    .bingo {
-        padding-left: 0;
-    }
-    .demo-dialog {
-        max-width: 80vw;
-        max-height: calc( 100vh - 150px );
-    }
+.padding-table {
+    width: calc( 100% - 30px );
+    margin: 15px;
+}
+.padding-table .row {
+    width: 100%;
+    margin: 0 auto;
 }
 .block {
     border-style: solid;
     font-size: 1.2em;
     cursor: pointer;
     position: relative;
-    padding: 0;
+    padding: 2.5px;;
 }
 
 .bingo-value {
@@ -164,5 +159,40 @@
 }
 .material-icons {
     font-size: 1.2em;
-    transform: translateY(18%);
+    line-height: 1.2em;
+    transform: translateY(10%);
+}
+.lock {
+    margin-left: 100%;
+    transform: translate( calc( -100% + 2px ), -2px);
+    font-size: 1em;
+    color: rgb(0 0 0 / 62%);
+}
+.lock.is-lock {
+    color: #a54e2b;
+}
+@media only screen and (max-width: 992px) {
+    .container-fluid {
+        margin-top: 10px;
+        width: calc( 100% - 20px );
+    }
+    .bingo {
+        padding-left: 0;
+    }
+    .demo-dialog {
+        max-width: 80vw;
+        max-height: calc( 100vh - 150px );
+    }
+}
+@media only screen and (min-width: 992px) and (max-width: 1200px) {
+    .lock {
+        font-size: 0.8em;
+        transform: translate( calc( -100% + 2px ), -7px);
+    }
+}
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+    .lock {
+        font-size: 1.5em;
+        transform: translate( calc( -100% + 2px ), 2px);
+    }
 }

@@ -66,10 +66,41 @@
     }
 
     /**
+     * 從 div 中取得 lock 資訊
+     */
+    function getLockFromDiv() {
+        var lock = [];
+        $('.block span.lock.is-lock').each(function(){
+            var blockID = $(this).parents('.block').attr('id').replace(/^[^\d]+/,'');
+            lock.push(parseInt(blockID));
+        })
+        return lock;
+    }
+
+    /**
+     * 取得任意基因的特徵資訊
+     *
+     * @param int skillID 基因ID
+     */
+    function getFeatureKey(skillID) {
+        var featureData = skillFeatureIndex[skillID];
+        if (!featureData) {
+            return '';
+        }
+        return featureData.type+CALC_BINGO_SP_FEATURE+featureData.acction;
+    }
+
+    /**
+     *
+     * 計算自動排序
+     * 用遞迴歸納出所有可能組合，並在每一組組合出爐時直接判斷是否符合賓果規則
+     * 有則紀錄之，並歸納進排序內
+     *
      *
      * @param int[] input 需要計算的基因id，以陣列輸入，ex: [1,2,3,4,5,6,7,8,9]
      * @param Object sort 要排序的規則，格式 [ ['type', 1], ['type', 2], ['acction', 2] ]
      * @param int[] lock 要鎖住不更換位置的 blockID，以陣列形式輸入，ex: [1, 3, 5] (註: id從1起算)
+     * @param int show 要顯示總共幾個結果
      */
     function calcBingo(input, sort, lock, show) {
         show = parseInt(show)?parseInt(show):CALC_BINGO_SHOW_DEFAULT;
@@ -245,29 +276,19 @@
         }
     }
 
-    function getFeatureKey(skillID) {
-        var featureData = skillFeatureIndex[skillID];
-        if (!featureData) {
-            return '';
-        }
-        return featureData.type+CALC_BINGO_SP_FEATURE+featureData.acction;
-    }
-    function getLock() {
-        var lock = [];
-        $('.block span.lock.is-lock').each(function(){
-            var blockID = $(this).parents('.block').attr('id').replace(/^[^\d]+/,'');
-            lock.push(parseInt(blockID));
-        })
-        return lock;
-    }
-
+    /**
+     * 計算自動排列
+     *
+     * calcBingo 的前一步驟，會把所需的資料搜集好後送給 calcBingo
+     * 並透過 calcBingo 的回傳內容決定該給錯誤訊息還是要顯示結果。
+     */
     function autoCalc() {
         var skill = getSkillFromDiv(); // 取得頁面中的基因格資訊
         var sort = [ // 取得排序依據
             $('#calc-sort-1').val().split('-'),
             $('#calc-sort-2').val().split('-'),
         ];
-        var lock = getLock();
+        var lock = getLockFromDiv();
         var show = CALC_BINGO_SHOW_DEFAULT;
 
         var calcing = new Dialogify('<div style="text-align: center;margin-top: 25px;"><div class="spinner-border" role="status"><span class="sr-only"></span></div></div>');
@@ -282,65 +303,96 @@
             if (!calcResult['success']) {
                 Dialogify.alert('分析失敗：'+calcResult['msg']);
             } else {
-                var html='';
-                html+= '<div class="row">';
-                $.each(calcResult['data'], function(map, bingoInfo) {
-                    html+='<div class="col-sm-12 col-md-6"><div class="row" style="margin-bottom:20px">';
-                    html+='<div class="col-6">';
-                    // 切割為陣列
-                    var mapArr = map.split(CALC_BINGO_SP_BLOCK);
-                    var newSkillParm = [];
-                    var tmpSkill = Object.assign({}, skill);
-                    var mapHtml = '<div class="row" >';
-                    $.each(mapArr, function(doesntmatter, feature) {
-                        var featureData = feature.split(CALC_BINGO_SP_FEATURE);
-                        var type = featureData[0];
-                        var action = featureData[1];
-                        mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>';
-
-                        // 建立新的 url Parm
-                        $.each(tmpSkill, function(skillKey, skillID) {
-                            if (getFeatureKey(skillID) != feature) {
-                                return;
-                            }
-                            newSkillParm.push(skillID);
-                            delete(tmpSkill[skillKey]);
-                            return false;
-                        });
-                    });
-                    mapHtml+='</div>';
-                    var url = buildURL(newSkillParm, false, true);
-                    html+= '<a href="'+url+'">'+mapHtml+'</a>';
-                    html+= '</div>';
-
-                    var bingoInfoString = [];
-                    $.each(FEATURE_INDEX, function(featureRoot, featureData) {
-                        $.each(featureData, function(featureKey, featureName) {
-                            if (!bingoInfo[featureRoot] || ! bingoInfo[featureRoot][featureKey]) {
-                                return;
-                            }
-                            var bingoNum = bingoInfo[featureRoot][featureKey];
-                            var rootName = FEATURE_ROOT_NAME[featureRoot];
-                            var str = featureName+' '+rootName+': x'+bingoNum;
-                            bingoInfoString.push(str);
-                        });
-                    })
-                    bingoInfoString = bingoInfoString.join('<br>', bingoInfoString);
-                    html+= '<div class="col-6"><div>賓果結果:<p style="margin-left:5px;margin-top:10px;">'+bingoInfoString+'</p></div></div>';
-                    html+= '</div></div>';
-                });
-                html+='</div>';
-
-                var dailog = new Dialogify('<div style="width: 90%; margin: 0 auto;">'+html+'</div>', {
-                    size: 'demo-dialog',
-                });
-                dailog.title('計算結果<span class="material-icons align-text-bottom" style="cursor: pointer;margin-left:5px" onclick="calcInfo()">help_outline</span>');
-                dailog.showModal();
+                showCalc(calcResult['data'], skill, lock);
             }
         }, 10);
 
         return;
     }
+
+    /**
+     * 組建自動排列的計算結果，並顯示燈箱
+     *
+     * @param {} soultion  calcBingo() 回傳的 result['data']
+     * @param int[] skill 原始基因的輸入陣列，長度為 9 每一個陣列元素對應指定格子中的skillID ex: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+     * @param int[] lock  要鎖定的格字編號，元素為要鎖定的編號 ex: [1,4]
+     */
+    function showCalc(soultion, skill, lock) {
+        var html='';
+        html+= '<div class="row">';
+
+        $.each(soultion, function(map, bingoInfo) {
+            html+='<div class="col-sm-12 col-md-6"><div class="row" style="margin-bottom:20px">';
+            html+='<div class="col-6">';
+            // 切割為陣列
+            var mapArr = map.split(CALC_BINGO_SP_BLOCK);
+            // var newSkillParm = [];
+            var newSkillParm = new Array(9);
+            var tmpSkill = Object.assign({}, skill);
+            var mapHtml = '<div class="row" >';
+
+            // 如果有lock 則優先分配 lock 的 skill
+            $.each(lock, function(doesntmatter, blockID) {
+                var skillKey = blockID-1;
+                newSkillParm[skillKey] = tmpSkill[skillKey];
+                delete(tmpSkill[skillKey]);
+            });
+
+            // 開始組建圖表以及分配剩餘 skill 到 url
+            $.each(mapArr, function(key, feature) {
+                var featureData = feature.split(CALC_BINGO_SP_FEATURE);
+                var type = featureData[0];
+                var action = featureData[1];
+                mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>'; // 建立圖俵內容
+
+                // 分派 skill 到 url Parm (如果已經分配了就不用再分配了)
+                if (!!newSkillParm[key]) {
+                    return;
+                }
+
+                // 從剩餘的skill 裡面找尋相同特徵的基因，一致者就塞入，並且從原物件中移除掉，避免被重複分配。
+                $.each(tmpSkill, function(skillKey, skillID) {
+                    if (getFeatureKey(skillID) != feature) {
+                        return;
+                    }
+                    newSkillParm[key] = skillID;
+                    delete(tmpSkill[skillKey]);
+                    return false;
+                });
+            });
+            mapHtml+='</div>';
+            var url = buildURL(newSkillParm, false, true);
+            html+= '<a href="'+url+'">'+mapHtml+'</a>';
+            html+= '</div>';
+
+            // 組建 info 訊息 (顯示幾條就好了)
+            var bingoInfoString = [];
+            $.each(FEATURE_INDEX, function(featureRoot, featureData) {
+                $.each(featureData, function(featureKey, featureName) {
+                    if (!bingoInfo[featureRoot] || ! bingoInfo[featureRoot][featureKey]) {
+                        return;
+                    }
+                    var bingoNum = bingoInfo[featureRoot][featureKey];
+                    var rootName = FEATURE_ROOT_NAME[featureRoot];
+                    var str = featureName+' '+rootName+': x'+bingoNum;
+                    bingoInfoString.push(str);
+                });
+            })
+            bingoInfoString = bingoInfoString.join('<br>', bingoInfoString);
+            html+= '<div class="col-6"><div>賓果結果:<p style="margin-left:5px;margin-top:10px;">'+bingoInfoString+'</p></div></div>';
+            html+= '</div></div>';
+        });
+        html+='</div>';
+
+        var dailog = new Dialogify('<div style="width: 90%; margin: 0 auto;">'+html+'</div>', {
+            size: 'demo-dialog',
+        });
+        dailog.title('計算結果<span class="material-icons align-text-bottom" style="cursor: pointer;margin-left:5px" onclick="calcInfo()">help_outline</span>');
+        dailog.showModal();
+
+    }
+
+    // lock 點擊後的動作
     $('.lock').on('click', function(){
         if ($(this).parent('.block').data('id') == 0 ) {
             return false;
@@ -355,6 +407,7 @@
         return false;
     })
 
+    // 顯示自動排列的規則
     function calcInfo() {
         Dialogify.alert('根據你所提供的基因內容，系統目前會依據可達成的賓果圖形：<ul><li>從每種 最優解群集 中取出最多 <b>'+ CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT +'組</b> 圖形</li><li>並依據若干種最優解群集，取出當中最多總計 <b>'+ CALC_BINGO_SHOW_DEFAULT +'組</b> 圖形</li></ul>以供參考。<br><br>各圖形可點擊，點擊後會連結至對應頁面，以利進行分享/ 儲存。');
     }
@@ -634,7 +687,7 @@
 
     function buildURL(skills, lock, justReturn) {
         var skills = !!skills?skills:getSkillFromDiv();
-        var lock = !!lock?lock:getLock();
+        var lock = !!lock?lock:getLockFromDiv();
         var justReturn = justReturn!==undefined?justReturn:false;
 
 

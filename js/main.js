@@ -638,8 +638,8 @@
         var justReturn = justReturn!==undefined?justReturn:false;
 
 
-        skills = getSkillFromDiv().join(',')
-        lock = getLock().join(',');
+        skills = skills.join(',')
+        lock = lock.join(',');
 
         var url = location.protocol + '//' + location.host + location.pathname + '?skills=' + skills+ '&lock=' + lock;
 

@@ -441,7 +441,7 @@
             dataType: 'json',
         }).done(function (data) {
             var html = '';
-            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-action="-1"><img class="icon" src="images/icon/-1/-1.png"> ' + data[-1][-1][0].name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(1);">help_outline</span></div>';
+            html += '<div class="col-12" style="margin-top: 5px;"><button class="col-10 text-start btn btn-outline-secondary skill skill-' + data[-1][-1][0].id + '" data-id="1" data-type="-1" data-action="-1" data-name="虹色基因"><img class="icon" src="images/icon/-1/-1.png"> ' + data[-1][-1][0].name + '</button><span class="material-icons align-text-bottom" style="cursor: pointer;" onclick="getSkillInfo(1);">help_outline</span></div>';
 
             for (var i=1;i<=6;i++) {
                 for (var j=1;j<=4;j++) {
@@ -608,25 +608,20 @@
         buildURL();
     }
 
+    $('.block').on('click', '.clean-block', function(){
+        var block = $(this).parents('.block');
+        var skillId = block.data('id');
+
+        setBlock(block, 0);
+        enableSkill(skillId);
+        return false;
+    })
+
     var clickBlock = function (e) {
         var skillSelected = $('.skill.btn-secondary:enabled');
         var blockSelected = $('.block.is-selected');
-        var blockClick = $(e.target);
+        var blockClick = $(this);
 
-        if (blockClick.hasClass('clean-block')) {
-            var block = blockClick.parents('.block');
-            var skillId = block.data('id');
-
-            setBlock(block, 0);
-            enableSkill(skillId);
-            return false;
-        }
-
-        for (var i=0;i<2;i++) {
-            if (blockClick.hasClass('block') === false) {
-                blockClick = blockClick.parent();
-            }
-        }
 
         if ( blockSelected.children('.lock').is('.is-lock') || blockClick.children('.lock').is('.is-lock')) {
             Dialogify.alert('基因已經鎖定');
@@ -660,23 +655,39 @@
     var setBlock = function (block, skillId, doBuildURL) {
         doBuildURL = doBuildURL!==undefined?doBuildURL:true;
         skillId = parseInt(skillId, 10);
+        var htmlContent = '';
+
+        var skillNameBlock = $('<div></div>').addClass('skill-name-block');
         var type = 0;
         var action = 0;
+        var imgUrl = '';
         var name = '請先選擇基因';
 
         if (skillId !== 0) {
+            block.addClass('got-skill');
             var skill = $('.skill-' + skillId);
+
             type = skill.data('type');
             action = skill.data('action');
-            name = skill.html() + '<span class="material-icons clean-block">delete</span>';
+            name = skill.text();
+            imgUrl = 'images/icon/'+action+'/'+type+'.png';
         } else {
+            block.removeClass('got-skill');
             block.children('.lock').text('lock_open').removeClass('is-lock');
         }
+
+        htmlContent = skillNameBlock.html('<div class="skill-name-text">'+name+'</div>');
 
         block.data('id', skillId);
         block.data('type', type);
         block.data('action', action);
-        block.children('div').html(name);
+        block.children('.skill-area').html(htmlContent);
+
+        if (imgUrl) {
+            block.children('.skill-area').css('background-image','url('+imgUrl+')');
+        } else {
+            block.children('.skill-area').css('background-image','');
+        }
 
         checkBingo();
 

@@ -24,6 +24,18 @@
     position: relative;
     padding: 2.5px;;
 }
+#block-1 {
+    border-top-left-radius: 5px;
+}
+#block-3 {
+    border-top-right-radius: 5px;
+}
+#block-7 {
+    border-bottom-left-radius: 5px;
+}
+#block-9 {
+    border-bottom-right-radius: 5px;
+}
 
 .bingo-value {
     font-family: Arial, Helvetica, sans-serif;
@@ -73,12 +85,40 @@
     min-width: 80px;
 }
 
-.col.block div {
-    transform: translateY(-50%);
+.col.block .skill-area {
     position: absolute;
-    width: 100%;
-    margin-top: 50%;
     text-align: center;
+    background-size: 75%;
+    background-repeat: no-repeat;
+    width: calc( 100% - 5px );
+    height: 100%;
+    background-position: 50% 5%;
+}
+.col.block .skill-area .skill-name-block {
+    transform: translateY(-50%);
+    margin-top: 50%;
+}
+.col.block.got-skill .skill-area .skill-name-block {
+    font-size: 0.8em;
+    margin: auto;
+    margin-top: 100%;
+    background: #000000ad;
+    color: white;
+    border-radius: 5px;
+    border: solid 2px;
+    transform: translateY(-100%);
+    padding: 2px 5px;
+    border-color: #ffffff63;
+    width: calc( 100% - 10px );
+    max-width: 95%;
+}
+.col.block .skill-area .skill-name-text {
+    display: grid;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    height: 3em;
+    line-height: 1.4em;
 }
 
 .dark-mode {
@@ -163,15 +203,25 @@
     transform: translateY(10%);
 }
 .lock {
-    margin-left: 100%;
-    transform: translate( calc( -100% + 2px ), -2px);
+    position: absolute;
+    transform: translate( -2px, -2px);
     font-size: 1em;
-    color: rgb(0 0 0 / 62%);
+    display: none;
+}
+.clean-block {
+    position: absolute;
+    margin-left: 100%;
+    transform: translate( calc( -100% + -2px ), -2px);
+    font-size: 1em;
+    display: none;
+}
+.got-skill .clean-block, .got-skill .lock {
+    display: block;
 }
 .lock.is-lock {
     color: #a54e2b;
 }
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 991px) {
     .container-fluid {
         margin-top: 10px;
         width: calc( 100% - 20px );
@@ -185,14 +235,29 @@
     }
 }
 @media only screen and (min-width: 992px) and (max-width: 1200px) {
-    .lock {
+    .lock, .clean-block{
         font-size: 0.8em;
-        transform: translate( calc( -100% + 2px ), -7px);
+    }
+
+    .col.block.got-skill .skill-area .skill-name-block {
+        font-size: 0.6em;
     }
 }
-@media only screen and (min-width: 768px) and (max-width: 992px) {
-    .lock {
+@media only screen and (max-width: 991px) {
+    .lock, .clean-block{
         font-size: 1.5em;
-        transform: translate( calc( -100% + 2px ), 2px);
+    }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+    .col.block .skill-area {
+        background-position: 50% 15%;
+    }
+}
+@media only screen and (max-width: 500px) {
+    .lock, .clean-block{
+        font-size: 1em;
+    }
+    .col.block.got-skill .skill-area .skill-name-block {
+        font-size: 0.7em;
     }
 }

@@ -33,44 +33,53 @@ require_once('config.php');
                         <div class="padding-table">
                             <div class="row">
                                 <div id="block-1" class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                                 <div id="block-2" class="col block block-2 line-1 line-5 border-left-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                                 <div id="block-3" class="col block block-3 line-1 line-6 line-8 border-left-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div id="block-4" class="col block block-4 line-2 line-4 border-top-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                                 <div id="block-5" class="col block block-5 line-2 line-5 line-7 line-8 border-top-none border-left-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                                 <div id="block-6" class="col block block-6 line-2 line-6 border-top-none border-left-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div id="block-7" class="col block block-7 line-3 line-4 line-8 border-top-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                                 <div id="block-8" class="col block block-8 line-3 line-5 border-top-none border-left-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                                 <div id="block-9" class="col block block-9 line-3 line-6 line-7 border-top-none border-left-none" data-id="0" data-type="0" data-action="0">
-                                    <div>請先選擇基因</div>
+                                    <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
                                     <span class="material-icons lock">lock_open</span>
+                                    <span class="material-icons clean-block">delete</span>
                                 </div>
                             </div>
                         </div>

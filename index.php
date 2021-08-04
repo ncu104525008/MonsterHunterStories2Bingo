@@ -31,6 +31,7 @@ require_once('config.php');
                 <div class="row">
                     <div class="col-sm-12 col-lg-8">
                         <div class="padding-table">
+                            <svg id="bingo-line"  width="100" height="100" version="1.1" xmlns=""></svg>
                             <div class="row">
                                 <div id="block-1" class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-action="0">
                                     <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>

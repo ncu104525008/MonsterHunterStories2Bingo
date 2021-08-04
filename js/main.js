@@ -185,7 +185,7 @@
                         if (eachFeatureData[0] != -1) {
                             featureTypeMatch[eachFeatureData[0]] = true;
                         }
-                        if (eachFeatureData[0] != -1) {
+                        if (eachFeatureData[1] != -1) {
                             featureActionMatch[eachFeatureData[1]] = true;
                         }
                     });
@@ -432,6 +432,10 @@
             var o = $(this);
             o.css('height', h + 'px');
         });
+        var tableWidth =  $('#bingo-line').parents().outerWidth();
+        var rate = tableWidth / $('#bingo-line').outerWidth();
+
+        $('#bingo-line').css('transform', 'scale('+rate+')');
     };
 
     var setSkillButton = function () {
@@ -601,10 +605,11 @@
                 v = 0;
             }
             var blockID = k+1;
-            setBlock($('#block-' + blockID), v, false);
+            setBlock($('#block-' + blockID), v, false, false);
             disableSkill(v);
         });
 
+        checkBingo();
         buildURL();
     }
 
@@ -643,8 +648,11 @@
             var id1 = blockSelected.data('id');
             var id2 = blockClick.data('id');
 
-            setBlock(blockSelected, id2);
-            setBlock(blockClick, id1);
+            setBlock(blockSelected, id2, false, false);
+            setBlock(blockClick, id1, false, false);
+
+            checkBingo();
+            buildURL();
 
             blockSelected.removeClass('is-selected');
         } else {
@@ -652,8 +660,9 @@
         }
     };
 
-    var setBlock = function (block, skillId, doBuildURL) {
+    var setBlock = function (block, skillId, doBuildURL, doCheckBingo) {
         doBuildURL = doBuildURL!==undefined?doBuildURL:true;
+        doCheckBingo = doCheckBingo!==undefined?!!doCheckBingo:true;
         skillId = parseInt(skillId, 10);
         var htmlContent = '';
 
@@ -689,7 +698,9 @@
             block.children('.skill-area').css('background-image','');
         }
 
-        checkBingo();
+        if (doCheckBingo) {
+            checkBingo();
+        }
 
         if (doBuildURL) {
             buildURL();
@@ -732,44 +743,50 @@
     var checkBingo = function () {
         var type = [];
         var action = [];
+        var bingoLine = {};
 
         for (var i=1;i<=8;i++) {
+
+            // 先把block的目標整理出來
             var blockInLine = $('.line-' + i);
-            var block1 = blockInLine.eq(0);
-            var block2 = blockInLine.eq(1);
-            var block3 = blockInLine.eq(2);
+            var lineBlock = [
+                blockInLine.eq(0),
+                blockInLine.eq(1),
+                blockInLine.eq(2),
+            ];
 
-            var type1 = parseInt(block1.data('type'));
-            var type2 = parseInt(block2.data('type'));
-            var type3 = parseInt(block3.data('type'));
+            // 宣告一個稍後用來比對賓果狀況的變數
+            var features = {
+                'type':{},
+                'action':{},
+            };
+            // 逐一輪掃這一條 bingo 中所需檢驗的格子
+            $.each(lineBlock, function(doesntmatter, $eachBlock) {
+                var blockType = parseInt($eachBlock.data('type'));
+                if (blockType != -1) {
+                    features['type'][blockType] = true;
+                }
 
-            if (type1 === type2 && type1 === type3) {
-                type.push(type1);
-            } else if (type1 === -1 && type2 === type3) {
-                type.push(type2);
-            } else if (type2 === -1 && type1 === type3) {
-                type.push(type1);
-            } else if (type3 === -1 && type1 === type2) {
-                type.push(type1);
+                var blockAction = parseInt($eachBlock.data('action'));
+                if (blockAction != -1) {
+                    features['action'][blockAction] = true;
+                }
+            });
+
+            var bingoType;
+            if ((bingoType = Object.keys(features['type'])).length==1) {
+                type.push(bingoType[0]);
+                bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
+                bingoLine[i]['type'] = bingoType;
             }
 
-            var action1 = parseInt(block1.data('action'));
-            var action2 = parseInt(block2.data('action'));
-            var action3 = parseInt(block3.data('action'));
-
-            if (action1 === action2 && action2 === action3) {
-                action.push(action1);
-            } else if (action1 === -1 && action2 === action3) {
-                action.push(action2);
-            } else if (action2 === -1 && action1 === action3) {
-                action.push(action1);
-            } else if (action3 === -1 && action1 === action2) {
-                action.push(action1);
+            var bingoAction;
+            if ((bingoAction = Object.keys(features['action'])).length==1) {
+                type.push(bingoAction[0]);
+                bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
+                bingoLine[i]['action'] = bingoAction;
             }
         }
-
-        var typeText = {1: '無', 2: '火', 3: '水', 4: '雷', 5: '冰', 6: '龍'};
-        var actionText = {1: '力量', 2: '技巧', 3: '速度', 4: '無'};
 
         var count = {};
         for (var i=0;i<type.length;i++) {
@@ -821,7 +838,45 @@
             target.text(rate);
         }
 
+        drawBingoLine(bingoLine);
+
     };
+
+    /**
+     * 畫賓果線
+     *
+     * @param {*} bingoDatas  exp : {1 : {trye:1, action:2}, 3 : {trye:1, action:3}, .... }
+     */
+    function drawBingoLine(bingoDatas) {
+
+        // 清理 svg
+        var $svg = $('#bingo-line');
+        $svg.empty();
+        $svg.attr('xmlns',location.protocol + '//' + location.host + location.pathname+'bingoline/svg');
+
+        const LineMap = {
+            1: [ [16.5, 16.5], [83.5, 16.5] ],
+            2: [ [16.5, 50], [83.5, 50] ],
+            3: [ [16.5, 83.5], [83.5, 83.5] ],
+            4: [ [16.5, 16.5], [16.5, 83.5] ],
+            5: [ [50, 16.5], [50, 83.5] ],
+            6: [ [83.5, 16.5], [83.5, 83.5] ],
+            7: [ [16.5, 16.5], [83.5, 83.5] ],
+            8: [ [83.5, 16.5], [16.5, 83.5] ],
+        }
+
+        // 開始畫立賓果線
+        $.each(bingoDatas, function(lineID, bingoData) {
+            var mapInfo = LineMap[lineID];
+            if (!!mapInfo) {
+                var posFrom = mapInfo[0];
+                var posTo = mapInfo[1];
+                $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" stroke-linecap="round" stroke-width="3" />');
+                $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="inner-line" stroke-linecap="round" stroke-width="2" />');
+            }
+        });
+        $svg.html($svg.html());
+    }
 
     var getSkillInfo = function (id) {
         if (skillInfo === null) {

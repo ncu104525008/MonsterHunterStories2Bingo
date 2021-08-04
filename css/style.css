@@ -221,6 +221,16 @@
 .lock.is-lock {
     color: #a54e2b;
 }
+#bingo-line {
+    transform-origin: left top;
+    position: absolute;
+}
+#bingo-line line {
+    stroke:var(--bs-gray);
+}
+#bingo-line line.inner-line {
+    stroke:var(--bs-gray);
+}
 @media only screen and (max-width: 991px) {
     .container-fluid {
         margin-top: 10px;

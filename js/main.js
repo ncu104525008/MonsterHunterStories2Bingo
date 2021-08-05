@@ -782,7 +782,7 @@
 
             var bingoAction;
             if ((bingoAction = Object.keys(features['action'])).length==1) {
-                type.push(bingoAction[0]);
+                action.push(bingoAction[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
                 bingoLine[i]['action'] = bingoAction;
             }

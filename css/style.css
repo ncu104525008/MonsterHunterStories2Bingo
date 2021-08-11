@@ -78,8 +78,12 @@
 
 .block.is-selected {
     color: #fff;
-    background-color: var(--bs-gray);
+    background-color: #3f474cd9;
     border-color: #000;
+}
+.dark-mode .block.is-selected {
+    background-color: #9bafbbc2;
+    border-color: white;
 }
 .btn.btn-sl {
     min-width: 80px;
@@ -102,7 +106,7 @@
     font-size: 0.8em;
     margin: auto;
     margin-top: 100%;
-    background: #000000ad;
+    background: #000000dd;
     color: white;
     border-radius: 5px;
     border: solid 2px;
@@ -225,11 +229,17 @@
     transform-origin: left top;
     position: absolute;
 }
-#bingo-line line {
-    stroke:var(--bs-gray);
+#bingo-line.hide {
+    visibility: hidden;
 }
-#bingo-line line.inner-line {
-    stroke:var(--bs-gray);
+#bingo-line line {
+    stroke:#3078b79e;
+}
+#bingo-line line.bingo-line-inner {
+    stroke:#000fff;
+}
+#bingo-line line.bingo-line-inner-inner {
+    stroke:#00efff;
 }
 @media only screen and (max-width: 991px) {
     .container-fluid {

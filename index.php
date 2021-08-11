@@ -23,6 +23,8 @@ require_once('config.php');
             <div class="col-lg-1"></div>
             <div class="col-lg-11">
                 <a id="light-switch" href="javascript:;" class="link-secondary" onclick="toggleDarkMode();">關燈</a>
+                &emsp;&emsp;
+                <a id="bingo-switch" href="javascript:;" class="link-secondary" onclick="toggleBingoLine();">隱藏賓果線</a>
             </div>
         </div>
         <div class="row">

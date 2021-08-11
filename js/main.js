@@ -5,6 +5,14 @@
         $('#light-switch').text('開燈');
         $('#light-switch').removeClass('link-secondary');
         $('#light-switch').addClass('link-light');
+        $('#bingo-switch').removeClass('link-secondary');
+        $('#bingo-switch').addClass('link-light');
+    }
+
+    var disableBingoLine = Cookies.get('disableBingoLine');
+    if (disableBingoLine == 1) {
+        $('#bingo-line').addClass('hide');
+        $('#bingo-switch').text('顯示賓果線');
     }
     var blocks = $('.block');
     var skillInfo = null;
@@ -927,8 +935,11 @@
             if (!!mapInfo) {
                 var posFrom = mapInfo[0];
                 var posTo = mapInfo[1];
-                $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" stroke-linecap="round" stroke-width="3" />');
-                $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="inner-line" stroke-linecap="round" stroke-width="2" />');
+                $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-outer" stroke-linecap="round" stroke-width="3" />');
+                if (Object.keys(bingoData).length > 1) {
+                    $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-inner" stroke-linecap="round" stroke-width="2.5" />');
+                    $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-inner-inner" stroke-linecap="round" stroke-width="1.25" />');
+                }
             }
         });
         $svg.html($svg.html());
@@ -1113,13 +1124,31 @@
             $('#light-switch').text('關燈');
             $('#light-switch').addClass('link-secondary');
             $('#light-switch').removeClass('link-light');
+            $('#bingo-switch').addClass('link-secondary');
+            $('#bingo-switch').removeClass('link-light');
             $('body').removeClass('dark-mode');
         } else {
             Cookies.set('darkMode', 1);
             $('#light-switch').text('開燈');
             $('#light-switch').removeClass('link-secondary');
             $('#light-switch').addClass('link-light');
+            $('#bingo-switch').removeClass('link-secondary');
+            $('#bingo-switch').addClass('link-light');
             $('body').addClass('dark-mode');
+        }
+    };
+
+    var toggleBingoLine = function () {
+        var disableBingoLine = Cookies.get('disableBingoLine');
+
+        if (disableBingoLine == 1) {
+            Cookies.set('disableBingoLine', 0);
+            $('#bingo-switch').text('隱藏賓果線');
+            $('#bingo-line').removeClass('hide');
+        } else {
+            Cookies.set('disableBingoLine', 1);
+            $('#bingo-switch').text('顯示賓果線');
+            $('#bingo-line').addClass('hide');
         }
     };
 
@@ -1131,6 +1160,7 @@
     window.delBingo = delBingo;
     window.copyUrl = copyUrl;
     window.toggleDarkMode = toggleDarkMode;
+    window.toggleBingoLine = toggleBingoLine;
     window.autoCalc = autoCalc;
     window.calcInfo = calcInfo;
 }) (window, jQuery, Cookies);

@@ -830,14 +830,14 @@
             });
 
             var bingoType;
-            if ((bingoType = Object.keys(features['type'])).length==1) {
+            if ((bingoType = Object.keys(features['type'])).length==1 && bingoType!=0) {
                 type.push(bingoType[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
                 bingoLine[i]['type'] = bingoType;
             }
 
             var bingoAction;
-            if ((bingoAction = Object.keys(features['action'])).length==1) {
+            if ((bingoAction = Object.keys(features['action'])).length==1 && bingoAction!=0) {
                 action.push(bingoAction[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
                 bingoLine[i]['action'] = bingoAction;

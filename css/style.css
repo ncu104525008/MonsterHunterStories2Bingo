@@ -201,6 +201,13 @@
     border: solid 1px gray;
     padding: 3%;
 }
+.row>.demo-block:nth-child(n+4) {
+    border-top: none;
+}
+.row>.demo-block:nth-child(3n+2) {
+    border-left: none;
+    border-right: none;
+}
 .demo-block img {
     width: 100%;
     height: auto;

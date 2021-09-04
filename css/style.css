@@ -9,6 +9,10 @@
 .demo-dialog {
     max-height: calc( 100vh - 150px );
 }
+.sl-dialog {
+    width: 600px;
+    max-width: 90vw;
+}
 .padding-table {
     width: calc( 100% - 30px );
     margin: 15px;
@@ -225,20 +229,20 @@
 .lock.is-lock {
     color: #a54e2b;
 }
-#bingo-line {
+.bingo-line {
     transform-origin: left top;
     position: absolute;
 }
-#bingo-line.hide {
+.bingo-line.hide {
     visibility: hidden;
 }
-#bingo-line line {
+.bingo-line line {
     stroke:#3078b79e;
 }
-#bingo-line line.bingo-line-inner {
+.bingo-line line.bingo-line-inner {
     stroke:#000fff;
 }
-#bingo-line line.bingo-line-inner-inner {
+.bingo-line line.bingo-line-inner-inner {
     stroke:#00efff;
 }
 @media only screen and (max-width: 991px) {

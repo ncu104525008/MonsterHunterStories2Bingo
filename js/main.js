@@ -11,7 +11,7 @@
 
     var disableBingoLine = Cookies.get('disableBingoLine');
     if (disableBingoLine == 1) {
-        $('#bingo-line').addClass('hide');
+        $('.bingo-line').addClass('hide');
         $('#bingo-switch').text('顯示賓果線');
     }
     var blocks = $('.block');
@@ -159,7 +159,9 @@
         // 如果原始資料有賓果，則優先將原始資料的特徵路徑塞進 sortMap 當中 (這麼做是為了使: 當原始資料為最優解時，則優先使其顯示)
         if (!$.isEmptyObject(originBingoResult)) {
             var originBingoResultSortKey = getBingoResultSortKey(originBingoResult, sort);
-            sortMap[originBingoResultSortKey] = [originFeaturePathData.join(CALC_BINGO_SP_BLOCK)];
+            sortMap[originBingoResultSortKey] = [];
+            sortMap[originBingoResultSortKey][0] = [];
+            sortMap[originBingoResultSortKey][0].push(originFeaturePathData.join(CALC_BINGO_SP_BLOCK));
         }
 
         // 遞迴填充 mainMap, sortMap
@@ -206,8 +208,20 @@
                     mainMap[featurePath] = result;
                     var sortKey = getBingoResultSortKey(result, sort);
 
-                    sortMap[sortKey] = sortMap[sortKey]?sortMap[sortKey]:[];
-                    sortMap[sortKey].push(featurePath);
+                    // 比較一下和原始輸入圖形的差異
+                    var diff = 0;
+                    $.each(featurePathData, function(key, featureKey) {
+                        if (featureKey != originFeaturePathData[key]) {
+                            diff++;
+                        }
+                    });
+
+                    // 因為 input 其實已經計算並塞進 sortMap 過了，所以只有當不相同的時候才需要塞入 sortMap
+                    if (!!diff)  {
+                        sortMap[sortKey] = sortMap[sortKey]?sortMap[sortKey]:[];
+                        sortMap[sortKey][diff] = sortMap[sortKey][diff]?sortMap[sortKey][diff]:[];
+                        sortMap[sortKey][diff].push(featurePath);
+                    }
                 }
             }
         }
@@ -226,8 +240,15 @@
             if (Object.keys(bestSolution).length >= show) {
                 return false;
             }
-            var mapGroup = sortMap[mapKey];
-            mapGroup = Array.from(new Set(mapGroup.map(JSON.stringify))).map(JSON.parse); // 濾除重複
+
+            // 把 sortMap[key] 內的資料階層攤平 (因為有先靠 diff 做差異性排列)
+            var tmpMapGroup = sortMap[mapKey];
+            var mapGroup = [];
+            $.each(tmpMapGroup, function(diff, mapContents) {
+                if (!!mapContents && mapContents.length > 0) {
+                    mapGroup = mapGroup.concat(mapContents);
+                }
+            });
             $.each(mapGroup, function(conut, mapResult){
                 // 每個最佳解群集只取 CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT 個
                 if (conut >= CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT) {
@@ -407,7 +428,7 @@
                 var featureData = feature.split(CALC_BINGO_SP_FEATURE);
                 var type = featureData[0];
                 var action = featureData[1];
-                mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>'; // 建立圖俵內容
+                mapHtml+='<div class="col-4 demo-block"><img class="icon" src="images/icon/'+action+'/'+type+'.png"></div>'; // 建立圖表內容
 
                 // 分派 skill 到 url Parm (如果已經分配了就不用再分配了)
                 if (!!newSkillParm[key]) {
@@ -496,10 +517,10 @@
             var o = $(this);
             o.css('height', h + 'px');
         });
-        var tableWidth =  $('#bingo-line').parents().outerWidth();
-        var rate = tableWidth / $('#bingo-line').outerWidth();
+        var tableWidth =  $('.bingo-line').parents().outerWidth();
+        var rate = tableWidth / $('.bingo-line').outerWidth();
 
-        $('#bingo-line').css('transform', 'scale('+rate+') translateY(-3%)');
+        $('.bingo-line').css('transform', 'scale('+rate+') translateY(-3%)');
     };
 
     var setSkillButton = function () {
@@ -902,7 +923,7 @@
             target.text(rate);
         }
 
-        drawBingoLine(bingoLine);
+        drawBingoLine(bingoLine, $('#bingo-line-main'));
 
     };
 
@@ -911,10 +932,9 @@
      *
      * @param {*} bingoDatas  exp : {1 : {trye:1, action:2}, 3 : {trye:1, action:3}, .... }
      */
-    function drawBingoLine(bingoDatas) {
+    function drawBingoLine(bingoDatas, $svg) {
 
         // 清理 svg
-        var $svg = $('#bingo-line');
         $svg.empty();
         $svg.attr('xmlns',location.protocol + '//' + location.host + location.pathname+'bingoline/svg');
 
@@ -1042,8 +1062,10 @@
 
         $.each(bingoData, function (k, v) {
             html += '<div class="row" style="margin-top: 10px;">';
-            html += '<div class="col-10"><button class="btn btn-primary text-left" style="width: 100%" onclick="loadBingoToBlock(' + k + ');">' + v.name + '</button></div>';
-            html += '<div class="col-2"><button class="btn btn-secondary" onclick="delBingo(' + k + ');">刪除</button></div>'
+            html += '<div class="col-12">';
+            html += '<button class="btn btn-primary text-left" style="width: calc( 97% - 90px ); margin-right:3%" onclick="loadBingoToBlock(' + k + ');">' + v.name + '</button>';
+            html += '<button class="btn btn-secondary" onclick="delBingo(' + k + ');" style="width:70px">刪除</button>'
+            html += '</div>';
             html += '</div>';
         });
 
@@ -1051,7 +1073,7 @@
             html += '<p>目前無紀錄</p>';
         }
 
-        new Dialogify(html, {size: Dialogify.SIZE_LARGE, useDialogForm: false}).showModal();
+        new Dialogify(html, {size: 'sl-dialog', useDialogForm: false}).showModal();
     };
 
     var loadBingoToBlock = function (id) {
@@ -1144,11 +1166,11 @@
         if (disableBingoLine == 1) {
             Cookies.set('disableBingoLine', 0);
             $('#bingo-switch').text('隱藏賓果線');
-            $('#bingo-line').removeClass('hide');
+            $('.bingo-line').removeClass('hide');
         } else {
             Cookies.set('disableBingoLine', 1);
             $('#bingo-switch').text('顯示賓果線');
-            $('#bingo-line').addClass('hide');
+            $('.bingo-line').addClass('hide');
         }
     };
 

@@ -470,7 +470,7 @@
             html+='<div class="col-sm-12 col-md-6"><div class="row" style="margin-bottom:20px">';
             html+='<div class="col-6">';
             html+='<div class="padding-table" style="margin: 0; width: 100%; height: 100%;">';
-            html+='<svg id="bingo-line-demo-'+soultionNo+'" class="bingo-line"  width="100" height="100" version="1.1" xmlns="" style="z-index:-1;"></svg>'
+            html+='<svg id="bingo-line-demo-'+soultionNo+'" class="bingo-line"  width="100" height="100" version="1.1" xmlns="" style="z-index:-1; visibility:hidden"></svg>'
             // 切割為陣列
             var mapArr = map.split(CALC_BINGO_SP_BLOCK);
             // var newSkillParm = [];
@@ -578,7 +578,10 @@
         });
 
         dailog.on('show', function(){
-            setTimeout(resizeBlock, 100);
+            setTimeout(function(){
+                resizeBlock()
+                dailog.$content.find('svg').css('visibility', '');
+            }, 0);
         })
         dailog.showModal();
 

@@ -578,7 +578,7 @@
         });
 
         dailog.on('show', function(){
-            setTimeout(resizeBlock, 50);
+            setTimeout(resizeBlock, 100);
         })
         dailog.showModal();
 
@@ -976,14 +976,14 @@
             if ((bingoType = Object.keys(features['type'])).length==1 && bingoType!=0) {
                 type.push(bingoType[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
-                bingoLine[i]['type'] = bingoType;
+                bingoLine[i]['type'] = bingoType[0];
             }
 
             var bingoAction;
             if ((bingoAction = Object.keys(features['action'])).length==1 && bingoAction!=0) {
                 action.push(bingoAction[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
-                bingoLine[i]['action'] = bingoAction;
+                bingoLine[i]['action'] = bingoAction[0];
             }
         }
 
@@ -1059,6 +1059,9 @@
                 var posFrom = mapInfo[0];
                 var posTo = mapInfo[1];
                 $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-outer" stroke-linecap="round" stroke-width="3" />');
+                if (!!bingoData['action'] && bingoData['action'] == 4) {
+                    delete(bingoData['action']);
+                }
                 if (Object.keys(bingoData).length > 1) {
                     $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-inner" stroke-linecap="round" stroke-width="2.5" />');
                     $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-inner-inner" stroke-linecap="round" stroke-width="1.25" />');

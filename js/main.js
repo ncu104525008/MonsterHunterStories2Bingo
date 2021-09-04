@@ -5,6 +5,14 @@
         $('#light-switch').text('開燈');
         $('#light-switch').removeClass('link-secondary');
         $('#light-switch').addClass('link-light');
+        $('#bingo-switch').removeClass('link-secondary');
+        $('#bingo-switch').addClass('link-light');
+    }
+
+    var disableBingoLine = Cookies.get('disableBingoLine');
+    if (disableBingoLine == 1) {
+        $('#bingo-line').addClass('hide');
+        $('#bingo-switch').text('顯示賓果線');
     }
     var blocks = $('.block');
     var skillInfo = null;
@@ -119,6 +127,7 @@
 
         // 把基因內容進行分類
         var featureGroup = {};
+        var originFeaturePathData = [];
         $.each(input, function(key, skillID) {
 
             // 取得特徵的key
@@ -137,22 +146,34 @@
                 featureGroup[featureKey] = !!featureGroup[featureKey]?featureGroup[featureKey]:[];
                 featureGroup[featureKey].push(skillID);
             }
+            originFeaturePathData.push(featureKey);
         });
 
         var mainMap={};
         var sortMap={};
         var totalMap=0;
+
+        // 不論如何都先針對原始資料進行計算
+        var originBingoResult = getBingoResult(originFeaturePathData);
+
+        // 如果原始資料有賓果，則優先將原始資料的特徵路徑塞進 sortMap 當中 (這麼做是為了使: 當原始資料為最優解時，則優先使其顯示)
+        if (!$.isEmptyObject(originBingoResult)) {
+            var originBingoResultSortKey = getBingoResultSortKey(originBingoResult, sort);
+            sortMap[originBingoResultSortKey] = [originFeaturePathData.join(CALC_BINGO_SP_BLOCK)];
+        }
+
+        // 遞迴填充 mainMap, sortMap
         blockDistributor(featureGroup);
 
         // 遞迴，每次排列後把分配歷程傳遞給下一回圈，直到沒有東西可以分配代表一組賓果分配完畢了。則可以檢核並儲存。
-        function blockDistributor(source, history) {
-            history = !!history?history:"";
+        function blockDistributor(source, featurePath) {
+            featurePath = !!featurePath?featurePath:"";
             // 只要還有東西就代表還需要分配
             if (!$.isEmptyObject(source)) {
                 // foreach 逐一進行分配
                 $.each(source, function(featureKey, idArr) {
                     // 記錄分配歷程
-                    var thisHistory = history?history+CALC_BINGO_SP_BLOCK+featureKey:featureKey;
+                    var thisFeaturePath = featurePath?featurePath+CALC_BINGO_SP_BLOCK+featureKey:featureKey;
 
                     // 分配完後移除以分配的物件 (用深複製避免變數互相影響)
                     var less = $.extend(true, {}, source);
@@ -162,85 +183,31 @@
                     }
 
                     // 繼續往下分配
-                    blockDistributor(less, thisHistory);
+                    blockDistributor(less, thisFeaturePath);
                 });
 
             // 沒有東西代表上一層分配已經把東西配完了，則可以開始計算賓果結果
             } else {
-                var result = {};
-                var historyData = history.split(CALC_BINGO_SP_BLOCK);
+                // 把 lock 的東西塞回去，讓長度補足回來
+                var featurePathData = featurePath.split(CALC_BINGO_SP_BLOCK);
                 $.each(lockData, function(key, eachLockTmp){
                     if (!!eachLockTmp) {
-                        historyData.splice(key, 0, eachLockTmp);
+                        featurePathData.splice(key, 0, eachLockTmp);
                     }
                 });
-                history = historyData.join(CALC_BINGO_SP_BLOCK);
-                var bingoSum = 0;
-                $.each(bingoRule, function(bingoRuleKey, eachRule) {
-                    var featureTypeMatch = {};
-                    var featureActionMatch = {};
-                    $.each(eachRule, function(doesntmatter, blockID){
-                        var eachFeatureData = historyData[blockID-1].split(CALC_BINGO_SP_FEATURE);
-                        // 彩虹的意思是：讓另外兩個自己去比較特徵。所以遇到彩虹基因時，直接不把彩虹列入比對就可以了
-                        if (eachFeatureData[0] != -1) {
-                            featureTypeMatch[eachFeatureData[0]] = true;
-                        }
-                        if (eachFeatureData[0] != -1) {
-                            featureActionMatch[eachFeatureData[1]] = true;
-                        }
-                    });
+                featurePath = featurePathData.join(CALC_BINGO_SP_BLOCK);
 
-                    // 如果只有一個key 代表賓果了
-                    var bingoKey;
-                    if ((bingoKey = Object.keys(featureTypeMatch)).length==1) {
-                        bingoKey = bingoKey[0];
-                        result['type'] = result['type']?result['type']:{};
-                        result['type'][bingoKey] = result['type'][bingoKey]?result['type'][bingoKey]:0;
-                        result['type'][bingoKey]++;
-
-                        bingoSum++;
-                    }
-                    if ((bingoKey = Object.keys(featureActionMatch)).length==1) {
-                        bingoKey = bingoKey[0];
-                        result['action'] = result['action']?result['action']:{};
-                        result['action'][bingoKey] = result['action'][bingoKey]?result['action'][bingoKey]:0;
-                        result['action'][bingoKey]++;
-
-
-                        bingoSum++;
-                    }
-                });
+                var result = getBingoResult(featurePathData);
 
                 totalMap++; // 順便記錄一下有幾種組合 (not important)
 
                 // 如果有賓果到再存起來就好
                 if (!$.isEmptyObject(result)) {
-                    mainMap[history] = result;
-                    var sortKey = [];
-                    if (!$.isEmptyObject(sort)) {
-                        $.each(sort, function(doesntmatter, featureData) {
-                            var targetFeature = featureData[0];
-                            var featureID = featureData[1];
-                            switch (targetFeature) {
-                                case '_sum':
-                                    sortKey.push(String(bingoSum).padStart('2', '0'));
-                                    break;
-                                case 'type':
-                                case 'action':
-                                    var thisKey = !!result[targetFeature] && !!result[targetFeature][featureID]?result[targetFeature][featureID]:0;
-                                    thisKey = String(thisKey).padStart('2', '0'); // 因為要轉成字串做排序，所以數字的位數必須一致
-                                    sortKey.push(thisKey);
-                                    break;
+                    mainMap[featurePath] = result;
+                    var sortKey = getBingoResultSortKey(result, sort);
 
-                                default:
-                                    //donoting
-                            }
-                        });
-                    }
-                    sortKey.push(String(bingoSum).padStart('2', '0')); // 因為要轉成字串做排序，所以數字的位數必須一致
-                    sortKey = sortKey.join('#');
                     sortMap[sortKey] = sortMap[sortKey]?sortMap[sortKey]:[];
-                    sortMap[sortKey].push(history);
+                    sortMap[sortKey].push(featurePath);
                 }
             }
         }
@@ -260,6 +227,7 @@
                 return false;
             }
             var mapGroup = sortMap[mapKey];
+            mapGroup = Array.from(new Set(mapGroup.map(JSON.stringify))).map(JSON.parse); // 濾除重複
             $.each(mapGroup, function(conut, mapResult){
                 // 每個最佳解群集只取 CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT 個
                 if (conut >= CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT) {
@@ -273,6 +241,102 @@
             success: true,
             msg: '分析成功',
             data: bestSolution,
+        }
+
+        /**
+         * 透過 特徵資料 分析賓果結果並回傳
+         *
+         * @param string[] featurePathData ex :["1_2", "1_3", "1_1", "2_1", "2_2" ....]
+         * @return object 賓果結果\
+         *   {
+         *      type: {
+         *        1: 1, // 代表 type1 一條
+         *        2: 3, // 代表 type2 三條
+         *      },
+         *      action: {
+         *        3: 4, // 代表 action3 四條
+         *      },
+         *      _sum: 8, // 代表共 8 條
+         *   }
+         */
+        function getBingoResult(featurePathData) {
+            var bingoResult = {};
+            var bingoSum = 0;
+            $.each(bingoRule, function(bingoRuleKey, eachRule) {
+                var featureTypeMatch = {};
+                var featureActionMatch = {};
+                $.each(eachRule, function(doesntmatter, blockID){
+                    var eachFeatureData = featurePathData[blockID-1].split(CALC_BINGO_SP_FEATURE);
+                    // 彩虹的意思是：讓另外兩個自己去比較特徵。所以遇到彩虹基因時，直接不把彩虹列入比對就可以了
+                    if (eachFeatureData[0] != -1) {
+                        featureTypeMatch[eachFeatureData[0]] = true;
+                    }
+                    if (eachFeatureData[1] != -1) {
+                        featureActionMatch[eachFeatureData[1]] = true;
+                    }
+                });
+
+                // 如果只有一個key 代表賓果了
+                var bingoKey;
+                if ((bingoKey = Object.keys(featureTypeMatch)).length==1 && bingoKey!=0) {
+                    bingoKey = bingoKey[0];
+                    bingoResult['type'] = bingoResult['type']?bingoResult['type']:{};
+                    bingoResult['type'][bingoKey] = bingoResult['type'][bingoKey]?bingoResult['type'][bingoKey]:0;
+                    bingoResult['type'][bingoKey]++;
+
+                    bingoSum++;
+                }
+                if ((bingoKey = Object.keys(featureActionMatch)).length==1 && bingoKey!=0) {
+                    bingoKey = bingoKey[0];
+                    bingoResult['action'] = bingoResult['action']?bingoResult['action']:{};
+                    bingoResult['action'][bingoKey] = bingoResult['action'][bingoKey]?bingoResult['action'][bingoKey]:0;
+                    bingoResult['action'][bingoKey]++;
+
+                    bingoSum++;
+                }
+
+                if (!!bingoSum) {
+                    bingoResult['_sum'] = bingoSum;
+                }
+            });
+
+            return bingoResult;
+        }
+
+        /**
+         * 以賓果結果取得排序用的key
+         *
+         * @param {*} bingoResult 賓果結果 (資料來源從 getBingoResult() 取得)
+         * @param {*} sort 排序規則
+         */
+        function getBingoResultSortKey(bingoResult, sort) {
+            var sortKey = [];
+            // 如果有賓果到再存起來就好
+            if (!$.isEmptyObject(bingoResult)) {
+                if (!$.isEmptyObject(sort)) {
+                    $.each(sort, function(doesntmatter, featureData) {
+                        var targetFeature = featureData[0];
+                        var featureID = featureData[1];
+                        switch (targetFeature) {
+                            case '_sum':
+                                sortKey.push(String(bingoResult['_sum']).padStart('2', '0'));
+                                break;
+                            case 'type':
+                            case 'action':
+                                var thisKey = !!bingoResult[targetFeature] && !!bingoResult[targetFeature][featureID]?bingoResult[targetFeature][featureID]:0;
+                                thisKey = String(thisKey).padStart('2', '0'); // 因為要轉成字串做排序，所以數字的位數必須一致
+                                sortKey.push(thisKey);
+                                break;
+
+                            default:
+                                //donoting
+                        }
+                    });
+                }
+                sortKey.push(String(bingoResult['_sum']).padStart('2', '0')); // 因為要轉成字串做排序，所以數字的位數必須一致
+            }
+            sortKey = sortKey.join('#');
+            return sortKey;
         }
     }
 
@@ -432,6 +496,10 @@
             var o = $(this);
             o.css('height', h + 'px');
         });
+        var tableWidth =  $('#bingo-line').parents().outerWidth();
+        var rate = tableWidth / $('#bingo-line').outerWidth();
+
+        $('#bingo-line').css('transform', 'scale('+rate+') translateY(-3%)');
     };
 
     var setSkillButton = function () {
@@ -601,10 +669,11 @@
                 v = 0;
             }
             var blockID = k+1;
-            setBlock($('#block-' + blockID), v, false);
+            setBlock($('#block-' + blockID), v, false, false);
             disableSkill(v);
         });
 
+        checkBingo();
         buildURL();
     }
 
@@ -643,8 +712,11 @@
             var id1 = blockSelected.data('id');
             var id2 = blockClick.data('id');
 
-            setBlock(blockSelected, id2);
-            setBlock(blockClick, id1);
+            setBlock(blockSelected, id2, false, false);
+            setBlock(blockClick, id1, false, false);
+
+            checkBingo();
+            buildURL();
 
             blockSelected.removeClass('is-selected');
         } else {
@@ -652,8 +724,9 @@
         }
     };
 
-    var setBlock = function (block, skillId, doBuildURL) {
+    var setBlock = function (block, skillId, doBuildURL, doCheckBingo) {
         doBuildURL = doBuildURL!==undefined?doBuildURL:true;
+        doCheckBingo = doCheckBingo!==undefined?!!doCheckBingo:true;
         skillId = parseInt(skillId, 10);
         var htmlContent = '';
 
@@ -689,7 +762,9 @@
             block.children('.skill-area').css('background-image','');
         }
 
-        checkBingo();
+        if (doCheckBingo) {
+            checkBingo();
+        }
 
         if (doBuildURL) {
             buildURL();
@@ -732,44 +807,50 @@
     var checkBingo = function () {
         var type = [];
         var action = [];
+        var bingoLine = {};
 
         for (var i=1;i<=8;i++) {
+
+            // 先把block的目標整理出來
             var blockInLine = $('.line-' + i);
-            var block1 = blockInLine.eq(0);
-            var block2 = blockInLine.eq(1);
-            var block3 = blockInLine.eq(2);
+            var lineBlock = [
+                blockInLine.eq(0),
+                blockInLine.eq(1),
+                blockInLine.eq(2),
+            ];
 
-            var type1 = parseInt(block1.data('type'));
-            var type2 = parseInt(block2.data('type'));
-            var type3 = parseInt(block3.data('type'));
+            // 宣告一個稍後用來比對賓果狀況的變數
+            var features = {
+                'type':{},
+                'action':{},
+            };
+            // 逐一輪掃這一條 bingo 中所需檢驗的格子
+            $.each(lineBlock, function(doesntmatter, $eachBlock) {
+                var blockType = parseInt($eachBlock.data('type'));
+                if (blockType != -1) {
+                    features['type'][blockType] = true;
+                }
 
-            if (type1 === type2 && type1 === type3) {
-                type.push(type1);
-            } else if (type1 === -1 && type2 === type3) {
-                type.push(type2);
-            } else if (type2 === -1 && type1 === type3) {
-                type.push(type1);
-            } else if (type3 === -1 && type1 === type2) {
-                type.push(type1);
+                var blockAction = parseInt($eachBlock.data('action'));
+                if (blockAction != -1) {
+                    features['action'][blockAction] = true;
+                }
+            });
+
+            var bingoType;
+            if ((bingoType = Object.keys(features['type'])).length==1 && bingoType!=0) {
+                type.push(bingoType[0]);
+                bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
+                bingoLine[i]['type'] = bingoType;
             }
 
-            var action1 = parseInt(block1.data('action'));
-            var action2 = parseInt(block2.data('action'));
-            var action3 = parseInt(block3.data('action'));
-
-            if (action1 === action2 && action2 === action3) {
-                action.push(action1);
-            } else if (action1 === -1 && action2 === action3) {
-                action.push(action2);
-            } else if (action2 === -1 && action1 === action3) {
-                action.push(action1);
-            } else if (action3 === -1 && action1 === action2) {
-                action.push(action1);
+            var bingoAction;
+            if ((bingoAction = Object.keys(features['action'])).length==1 && bingoAction!=0) {
+                action.push(bingoAction[0]);
+                bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
+                bingoLine[i]['action'] = bingoAction;
             }
         }
-
-        var typeText = {1: '無', 2: '火', 3: '水', 4: '雷', 5: '冰', 6: '龍'};
-        var actionText = {1: '力量', 2: '技巧', 3: '速度', 4: '無'};
 
         var count = {};
         for (var i=0;i<type.length;i++) {
@@ -821,7 +902,48 @@
             target.text(rate);
         }
 
+        drawBingoLine(bingoLine);
+
     };
+
+    /**
+     * 畫賓果線
+     *
+     * @param {*} bingoDatas  exp : {1 : {trye:1, action:2}, 3 : {trye:1, action:3}, .... }
+     */
+    function drawBingoLine(bingoDatas) {
+
+        // 清理 svg
+        var $svg = $('#bingo-line');
+        $svg.empty();
+        $svg.attr('xmlns',location.protocol + '//' + location.host + location.pathname+'bingoline/svg');
+
+        const LineMap = {
+            1: [ [16.5, 16.5], [83.5, 16.5] ],
+            2: [ [16.5, 50], [83.5, 50] ],
+            3: [ [16.5, 83.5], [83.5, 83.5] ],
+            4: [ [16.5, 16.5], [16.5, 83.5] ],
+            5: [ [50, 16.5], [50, 83.5] ],
+            6: [ [83.5, 16.5], [83.5, 83.5] ],
+            7: [ [16.5, 16.5], [83.5, 83.5] ],
+            8: [ [83.5, 16.5], [16.5, 83.5] ],
+        }
+
+        // 開始畫立賓果線
+        $.each(bingoDatas, function(lineID, bingoData) {
+            var mapInfo = LineMap[lineID];
+            if (!!mapInfo) {
+                var posFrom = mapInfo[0];
+                var posTo = mapInfo[1];
+                $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-outer" stroke-linecap="round" stroke-width="3" />');
+                if (Object.keys(bingoData).length > 1) {
+                    $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-inner" stroke-linecap="round" stroke-width="2.5" />');
+                    $svg.append('<line x1="'+posFrom[0]+'" y1="'+posFrom[1]+'" x2="'+posTo[0]+'" y2="'+posTo[1]+'" class="bingo-line-inner-inner" stroke-linecap="round" stroke-width="1.25" />');
+                }
+            }
+        });
+        $svg.html($svg.html());
+    }
 
     var getSkillInfo = function (id) {
         if (skillInfo === null) {
@@ -1002,13 +1124,31 @@
             $('#light-switch').text('關燈');
             $('#light-switch').addClass('link-secondary');
             $('#light-switch').removeClass('link-light');
+            $('#bingo-switch').addClass('link-secondary');
+            $('#bingo-switch').removeClass('link-light');
             $('body').removeClass('dark-mode');
         } else {
             Cookies.set('darkMode', 1);
             $('#light-switch').text('開燈');
             $('#light-switch').removeClass('link-secondary');
             $('#light-switch').addClass('link-light');
+            $('#bingo-switch').removeClass('link-secondary');
+            $('#bingo-switch').addClass('link-light');
             $('body').addClass('dark-mode');
+        }
+    };
+
+    var toggleBingoLine = function () {
+        var disableBingoLine = Cookies.get('disableBingoLine');
+
+        if (disableBingoLine == 1) {
+            Cookies.set('disableBingoLine', 0);
+            $('#bingo-switch').text('隱藏賓果線');
+            $('#bingo-line').removeClass('hide');
+        } else {
+            Cookies.set('disableBingoLine', 1);
+            $('#bingo-switch').text('顯示賓果線');
+            $('#bingo-line').addClass('hide');
         }
     };
 
@@ -1020,6 +1160,7 @@
     window.delBingo = delBingo;
     window.copyUrl = copyUrl;
     window.toggleDarkMode = toggleDarkMode;
+    window.toggleBingoLine = toggleBingoLine;
     window.autoCalc = autoCalc;
     window.calcInfo = calcInfo;
 }) (window, jQuery, Cookies);

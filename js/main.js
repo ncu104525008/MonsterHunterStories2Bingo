@@ -311,7 +311,7 @@
 
                 // 如果只有一個key 代表賓果了
                 var bingoKey;
-                if ((bingoKey = Object.keys(featureTypeMatch)).length==1 && !!bingoKey[0]) {
+                if ((bingoKey = Object.keys(featureTypeMatch)).length==1 && bingoKey[0] != 0) {
                     bingoKey = bingoKey[0];
                     bingoResult['type'] = bingoResult['type']?bingoResult['type']:{};
                     bingoResult['type'][bingoKey] = bingoResult['type'][bingoKey]?bingoResult['type'][bingoKey]:0;
@@ -319,7 +319,7 @@
 
                     bingoSum++;
                 }
-                if ((bingoKey = Object.keys(featureActionMatch)).length==1 && !!bingoKey[0] && bingoKey[0] != 4) {
+                if ((bingoKey = Object.keys(featureActionMatch)).length==1 && bingoKey[0] != 0 && bingoKey[0] != 4) {
                     bingoKey = bingoKey[0];
                     bingoResult['action'] = bingoResult['action']?bingoResult['action']:{};
                     bingoResult['action'][bingoKey] = bingoResult['action'][bingoKey]?bingoResult['action'][bingoKey]:0;
@@ -374,20 +374,20 @@
                 actionKinds = Object.values(bingoResult['action']).reduce(function(before, next){ return before+next});
             }
             sortKey.push(String(
-                'Asum'+':'+actionKinds
+                'extraSort3-actionSum'+':'+actionKinds
             ));
 
             if (!!bingoResult['action']) {
                 $.each(bingoResult['action'], function(featureID, bingoNum){
                     sortKey.push(String(
-                        'A'+featureID+':'+bingoNum
+                        'extraSort2-action-'+featureID+':'+bingoNum
                     ));
                 });
             }
             if (!!bingoResult['type']) {
                 $.each(bingoResult['type'], function(featureID, bingoNum){
                     sortKey.push(String(
-                        'T'+featureID+':'+bingoNum
+                        'extraSort1-type-'+featureID+':'+bingoNum
                     ));
                 });
             }
@@ -442,30 +442,12 @@
 
         function getLineGroup(blockID) {
             var lineGroup = [];
-            if ([1,2,3].indexOf(blockID) !== -1) {
-                lineGroup.push('1');
-            }
-            if ([4,4,6].indexOf(blockID) !== -1) {
-                lineGroup.push('2');
-            }
-            if ([7,8,9].indexOf(blockID) !== -1) {
-                lineGroup.push('3');
-            }
-            if ([1,4,7].indexOf(blockID) !== -1) {
-                lineGroup.push('4');
-            }
-            if ([2,5,8].indexOf(blockID) !== -1) {
-                lineGroup.push('5');
-            }
-            if ([3,6,9].indexOf(blockID) !== -1) {
-                lineGroup.push('6');
-            }
-            if ([1,5,9].indexOf(blockID) !== -1) {
-                lineGroup.push('7');
-            }
-            if ([3,5,7].indexOf(blockID) !== -1) {
-                lineGroup.push('8');
-            }
+            $.each(bingoRule, function(roleID, role){
+                var lineID = roleID+1;
+                if (role.indexOf(blockID) !== -1) {
+                    lineGroup.push(lineID);
+                }
+            });
 
             return lineGroup;
         }
@@ -538,11 +520,11 @@
                 var bingoResult = {};
 
                 var type = Object.keys(featureData['type']);
-                if (type.length == 1 && !!type[0]) {
+                if (type.length == 1 && type[0] != 0) {
                     bingoResult['type'] = type[0];
                 }
                 var action = Object.keys(featureData['action']);
-                if (action.length == 1 && !!action[0] && action[0] != 4) {
+                if (action.length == 1 && action[0] != 0 && action[0] != 4) {
                     bingoResult['action'] = action[0];
                 }
 
@@ -619,11 +601,11 @@
             <p style="margin-bottom: 5px;">自動排列是根據你所提供的基因內容與排序優位：</p>
             <ul>
                 <li style="margin-bottom: 10px; line-height: 16px;">
-                    找出指定排序優位的規則中，對應 賓果數量 最多的圖形，依序列入優勢解<br>
-                    (相同 賓果數量 下的優勢解可能會有若干種組合群集。)
+                    優先找出 目標賓果數量 最多的圖形，依序列入 優勢解 的備選名單中。<br>
+                    (相同賓果數量下的優勢解可能會有若干種組合群集)
                 </li>
                 <li style="margin-bottom: 10px; line-height: 16px;">
-                    當優勢解不只一種時，<br>系統會從每種 優勢解群集 中各取出最多 <b>`+ CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT +`組</b> 圖形，最終取出最多 <b>`+ CALC_BINGO_SHOW_DEFAULT +`組</b> 圖形提供參考。
+                    當優勢解不只一種時，<br>系統會從每一種 優勢解群集 中，各取出最多 <b>`+ CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT +`組</b> 圖形，最終取出總計最多 <b>`+ CALC_BINGO_SHOW_DEFAULT +`組</b> 圖形，作為解答。
                 </li>
                 <li style="margin-bottom: 10px; line-height: 16px;">
                     各圖形在條件總合都相同的情況下，『猜拳賓果數』較多者會被優先顯示。<br>&emsp;<span style="color: darkgray;"><s>因為我想應該沒什麼人在練跨屬吧</s>...(´・ω・\`)</span>
@@ -1016,14 +998,14 @@
             });
 
             var bingoType;
-            if ((bingoType = Object.keys(features['type'])).length==1 && !!bingoType[0]) {
+            if ((bingoType = Object.keys(features['type'])).length==1 && bingoType[0] != 0) {
                 type.push(bingoType[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
                 bingoLine[i]['type'] = bingoType[0];
             }
 
             var bingoAction;
-            if ((bingoAction = Object.keys(features['action'])).length==1 && !!bingoAction[0] && bingoAction[0]!=4) {
+            if ((bingoAction = Object.keys(features['action'])).length==1 && bingoAction[0] != 0 && bingoAction[0]!=4) {
                 action.push(bingoAction[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
                 bingoLine[i]['action'] = bingoAction[0];

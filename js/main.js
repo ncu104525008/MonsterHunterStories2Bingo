@@ -311,7 +311,7 @@
 
                 // 如果只有一個key 代表賓果了
                 var bingoKey;
-                if ((bingoKey = Object.keys(featureTypeMatch)).length==1 && bingoKey!=0) {
+                if ((bingoKey = Object.keys(featureTypeMatch)).length==1 && !!bingoKey[0]) {
                     bingoKey = bingoKey[0];
                     bingoResult['type'] = bingoResult['type']?bingoResult['type']:{};
                     bingoResult['type'][bingoKey] = bingoResult['type'][bingoKey]?bingoResult['type'][bingoKey]:0;
@@ -319,7 +319,7 @@
 
                     bingoSum++;
                 }
-                if ((bingoKey = Object.keys(featureActionMatch)).length==1 && bingoKey!=0) {
+                if ((bingoKey = Object.keys(featureActionMatch)).length==1 && !!bingoKey[0] && bingoKey[0] != 4) {
                     bingoKey = bingoKey[0];
                     bingoResult['action'] = bingoResult['action']?bingoResult['action']:{};
                     bingoResult['action'][bingoKey] = bingoResult['action'][bingoKey]?bingoResult['action'][bingoKey]:0;
@@ -369,17 +369,28 @@
                 sortKey.push(String(bingoResult['_sum']).padStart('2', '0')); // 因為要轉成字串做排序，所以數字的位數必須一致
             }
 
-            $.each(bingoResult, function(feature, featureResult) {
-                if (feature == 'action' || feature == 'type') {
-                    $.each(featureResult, function(featureID, bingoNum){
-                        sortKey.push(String(
-                            feature.substr(0, 1)+featureID+
-                            '_'+
-                            bingoNum.bingoNum
-                        ));
-                    });
-                }
-            });
+            var actionKinds = 0;
+            if (!!bingoResult['action'] && !$.isEmptyObject(bingoResult['action'])) {
+                actionKinds = Object.values(bingoResult['action']).reduce(function(before, next){ return before+next});
+            }
+            sortKey.push(String(
+                'Asum'+':'+actionKinds
+            ));
+
+            if (!!bingoResult['action']) {
+                $.each(bingoResult['action'], function(featureID, bingoNum){
+                    sortKey.push(String(
+                        'A'+featureID+':'+bingoNum
+                    ));
+                });
+            }
+            if (!!bingoResult['type']) {
+                $.each(bingoResult['type'], function(featureID, bingoNum){
+                    sortKey.push(String(
+                        'T'+featureID+':'+bingoNum
+                    ));
+                });
+            }
 
             sortKey = sortKey.join('#');
             return sortKey;
@@ -527,11 +538,11 @@
                 var bingoResult = {};
 
                 var type = Object.keys(featureData['type']);
-                if (type.length == 1) {
+                if (type.length == 1 && !!type[0]) {
                     bingoResult['type'] = type[0];
                 }
                 var action = Object.keys(featureData['action']);
-                if (action.length == 1) {
+                if (action.length == 1 && !!action[0] && action[0] != 4) {
                     bingoResult['action'] = action[0];
                 }
 
@@ -604,7 +615,36 @@
 
     // 顯示自動排列的規則
     function calcInfo() {
-        Dialogify.alert('根據你所提供的基因內容，系統目前會依據可達成的賓果圖形：<ul><li>從每種 最優解群集 中取出最多 <b>'+ CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT +'組</b> 圖形</li><li>並依據若干種最優解群集，取出當中最多總計 <b>'+ CALC_BINGO_SHOW_DEFAULT +'組</b> 圖形</li></ul>以供參考。<br><br>各圖形可點擊，點擊後會連結至對應頁面，以利進行分享/ 儲存。');
+        var html = `
+            <p style="margin-bottom: 5px;">自動排列是根據你所提供的基因內容與排序優位：</p>
+            <ul>
+                <li style="margin-bottom: 10px; line-height: 16px;">
+                    找出指定排序優位的規則中，對應 賓果數量 最多的圖形，依序列入優勢解<br>
+                    (相同 賓果數量 下的優勢解可能會有若干種組合群集。)
+                </li>
+                <li style="margin-bottom: 10px; line-height: 16px;">
+                    當優勢解不只一種時，<br>系統會從每種 優勢解群集 中各取出最多 <b>`+ CALC_BINGO_SHOW_PRE_SOLUTION_DEFAULT +`組</b> 圖形，最終取出最多 <b>`+ CALC_BINGO_SHOW_DEFAULT +`組</b> 圖形提供參考。
+                </li>
+                <li style="margin-bottom: 10px; line-height: 16px;">
+                    各圖形在條件總合都相同的情況下，『猜拳賓果數』較多者會被優先顯示。<br>&emsp;<span style="color: darkgray;"><s>因為我想應該沒什麼人在練跨屬吧</s>...(´・ω・\`)</span>
+                </li>
+                <li style="margin-bottom: 10px; line-height: 16px;">
+                    系統會依據你輸入圖形，儘量找尋與輸入最相近的圖形組合以供參考
+                </li>
+            </ul>
+            <br>
+            各圖形可點擊，點擊後會連結至對應頁面，方便大家 分享/ 儲存
+            <br><br>
+        `;
+        var dialog = new Dialogify(html);
+        dialog.title('想知道自動排列是怎麼算的嗎 |∀ﾟ)')
+              .buttons([
+                    {
+                        text: '最後祝大家挖蛋愉快 dd(ﾟ∀ﾟ)',
+                        type: Dialogify.BUTTON_PRIMARY,
+                    }
+              ]);
+        dialog.showModal();
     }
 
 
@@ -976,14 +1016,14 @@
             });
 
             var bingoType;
-            if ((bingoType = Object.keys(features['type'])).length==1 && bingoType!=0) {
+            if ((bingoType = Object.keys(features['type'])).length==1 && !!bingoType[0]) {
                 type.push(bingoType[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
                 bingoLine[i]['type'] = bingoType[0];
             }
 
             var bingoAction;
-            if ((bingoAction = Object.keys(features['action'])).length==1 && bingoAction!=0) {
+            if ((bingoAction = Object.keys(features['action'])).length==1 && !!bingoAction[0] && bingoAction[0]!=4) {
                 action.push(bingoAction[0]);
                 bingoLine[i] = !!bingoLine[i]?bingoLine[i]:{};
                 bingoLine[i]['action'] = bingoAction[0];

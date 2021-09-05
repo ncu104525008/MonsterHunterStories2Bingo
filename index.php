@@ -33,7 +33,7 @@ require_once('config.php');
                 <div class="row">
                     <div class="col-sm-12 col-lg-8">
                         <div class="padding-table">
-                            <svg id="bingo-line"  width="100" height="100" version="1.1" xmlns=""></svg>
+                            <svg id="bingo-line-main" class="bingo-line"  width="100" height="100" version="1.1" xmlns=""></svg>
                             <div class="row">
                                 <div id="block-1" class="col block block-1 line-1 line-4 line-7 align-middle" data-id="0" data-type="0" data-action="0">
                                     <div class="skill-area"><div class="skill-name-block">請先選擇基因</div></div>
@@ -94,38 +94,31 @@ require_once('config.php');
                         <div class="row" style="margin-top: 20px; text-align:center">
                             <div class="col-12" style="display:inline-flex">
                                 <div style="width:110px;line-height: 2.2em;font-size: 1em; text-align:left">自動排列：</div>
-                                <div style="width:calc( ( 100% - 230px ) / 2 ); min-width:calc( ( 85% - 110px ) / 2); padding-right:10px">
-                                    <select class="form-control" id="calc-sort-1">
-                                        <option value="_sum-">賓果總數最多 優先</option>
-                                        <?php
+                                <?php
+                                    for($sortSelectID = 1; $sortSelectID<=2; $sortSelectID++) {
+                                        $role = $sortSelectID==1?'優先':'次之';
+
+                                        echo "<div style='width:calc( ( 100% - 230px ) / 2 ); min-width:calc( ( 85% - 110px ) / 2); padding-right:10px'>";
+
+                                        echo "<select class='form-control' id='calc-sort-{$sortSelectID}'>";
+                                        echo "<option value='_sum-'>賓果總數 {$role}</option>";
+
+                                        echo "<option disabled>---猜拳---</option>";
                                         foreach (ACTIONS_LIST as $featureKey => $each) {
                                             if ($featureKey == ACTION_NONE) {
                                                 continue;
                                             }
-                                            echo "<option value='action-{$featureKey}'>{$each}猜拳 優先</option>";
+                                            echo "<option value='action-{$featureKey}'>{$each} {$role}</option>";
                                         }
+
+                                        echo '<option disabled>---屬性---</option>';
                                         foreach (TYPES_LIST as $featureKey => $each) {
-                                            echo "<option value='type-{$featureKey}'>{$each} 優先</option>";
+                                            echo "<option value='type-{$featureKey}'>{$each} {$role}</option>";
                                         }
-                                        ?>
-                                    </select>
-                                </div>
-                                <div style="width:calc( ( 100% - 230px ) / 2 ); min-width:calc( ( 85% - 110px ) / 2); padding-right:10px">
-                                    <select class="form-control" id="calc-sort-2">
-                                        <option value="_sum-">賓果總數最多 優先</option>
-                                        <?php
-                                        foreach (ACTIONS_LIST as $featureKey => $each) {
-                                            if ($featureKey == ACTION_NONE) {
-                                                continue;
-                                            }
-                                            echo "<option value='action-{$featureKey}'>{$each}猜拳 優先</option>";
-                                        }
-                                        foreach (TYPES_LIST as $featureKey => $each) {
-                                            echo "<option value='type-{$featureKey}'>{$each} 優先</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
+                                        echo "</select>";
+                                        echo "</div>";
+                                    }
+                                ?>
                                 <button class="btn btn-secondary btn-sl" onclick="autoCalc();" style="width: 120px; max-width: 15%">送出</button>
                             </div>
                         </div>
